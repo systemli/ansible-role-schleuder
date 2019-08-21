@@ -1,0 +1,79 @@
+# Where are the list-directories stored (contain log-files and GnuPG-keyrings).
+lists_dir: {{ schleuder_lists_dir }}
+
+# Where to write list-logs. The actual log-file will be <lists_logs_base_dir>/<hostname>/<listname>/list.log.
+listlogs_dir: {{ schleuder_listlogs_dir }}
+
+# Schleuder reads plugins also from this directory.
+plugins_dir: {{ schleuder_plugins_dir }}
+
+# Schleuder reads filters also from this directory path,
+# in the specific pre_decryption or post_decryption subdirectory.
+# Filter files must follow the following convention for the
+# filename: \d+_a_name.rb
+# Where \d+ is any number, that defines the place in the
+# list of filters and a_name must match the method name
+# of the filter.
+# The built-in filters are using round numbers for their
+# positioning within the list. Increased by ten.
+filters_dir: {{ schleuder_filters_dir }}
+
+# How verbose should Schleuder log to syslog? (list-specific messages are written to the list's log-file).
+log_level: {{ schleuder_log_level }}
+
+# Which keyserver to refresh keys from (used by `schleuder refresh_keys`, meant
+# to be run from cron weekly).
+# If you have gnupg 2.1, we strongly suggest to use a hkps-keyserver:
+#keyserver: hkps://hkps.pool.sks-keyservers.net
+# If you have gnupg 2.1 and TOR running locally, use a onion-keyserver:
+#keyserver: hkp://jirk5u4osbsr34t5.onion
+# If you have an OS-wide defined keyserver, specify a blank value to have that
+# one used:
+#keyserver:
+# The default works for all supported versions of gnupg:
+{% if schleuder_gpg_use_tor %}
+keyserver: {{ schleuder_gpg_tor_keyserver }}
+{% else %}
+keyserver: {{ schleuder_keyserver }}
+{% endif %}
+
+# Who is maintaining the overall schleuder installation and should be
+# notified about severe problems with lists.
+# This address should be a postmaster-like account, especially it should
+# not be another schleuder list.
+# Is also used as an envelope sender of admin notifications.
+superadmin: {{ schleuder_superadmin }}
+
+# For these options see documentation for ActionMailer::smtp_settings, e.g. <http://api.rubyonrails.org/classes/ActionMailer/Base.html>.
+smtp_settings:
+{% for key, value in schleuder_smtp_settings.iteritems() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+  #domain:
+  #enable_starttls_auto:
+  #openssl_verify_mode:
+  #authentication:
+  #user_name:
+  #password:
+
+# The database to use. Unless you want to run the tests you only need the `production`-section.
+database:
+  production:
+{% for key, value in schleuder_database.production.iteritems() %}
+    {{ key }}: {{ value }}
+{% endfor %}
+
+api:
+{% for key, value in schleuder_api.iteritems() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+  # List of api_keys to allow access to the API.
+  # Example:
+  # valid_api_keys:
+  #   - abcdef...
+  #   - zyxwvu...
+  valid_api_keys:
+    - {{ schleuder_cli_api_key }}
+  {% for key in schleuder_valid_api_keys %}
+    - {{ key }}
+  {% endfor %}

@@ -1,0 +1,55 @@
+---
+
+{% if schleuder_gitlab_default_subject_filters|default() %}
+subject_filters:
+{% for filter in schleuder_gitlab_default_subject_filters %}
+  - '{{ filter }}'
+{% endfor %}
+{% else %}
+subject_filters: []
+{% endif %}
+
+{% if schleuder_gitlab_default_sender_filters|default() %}
+sender_filters:
+{% for filter in schleuder_gitlab_default_sender_filters %}
+  - '{{ filter }}'
+{% endfor %}
+{% else %}
+sender_filters: []
+{% endif %}
+
+{% if schleuder_gitlab_default_gitlab_connection %}
+gitlab:
+  endpoint: {{ schleuder_gitlab_default_gitlab_connection.endpoint }}
+  token: {{ schleuder_gitlab_default_gitlab_connection.token }}
+{% endif %}
+
+lists:
+{% for lists in schleuder_gitlab_lists|sort %}
+{%    for key,value in lists.items() %}
+  {{ key }}:
+{%      for key, value in value.iteritems()|sort %}
+{% if key == 'project' or key == 'namespace' or key == 'ticket_prefix'%}
+    {{ key }}: {{ value }}
+{% endif %}
+{% if key == 'gitlab' %}
+    {{ key }}:
+{%      for key, value in value.iteritems()|sort %}
+      {{ key }}: {{ value }}
+{%      endfor %}
+{% endif %}
+{% if key == 'subject_filters' %}
+    {{ key }}:
+{%      for subject_filter in value %}
+      - '{{ subject_filter }}'
+{%      endfor %}
+{% endif %}
+{% if key == 'sender_filters' %}
+    {{ key }}:
+{%      for sender_filter in value %}
+      - '{{ sender_filter }}'
+{%      endfor %}
+{% endif %}
+{%      endfor %}
+{%    endfor %}
+{% endfor %}

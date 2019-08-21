@@ -1,0 +1,96 @@
+---
+
+# a small wrapper to manage init member keys and a schleuder_list
+
+- name: "{{ list.name }} | register existing schleuder lists"
+  shell: "schleuder-cli lists list"
+  args:
+    chdir: /root
+  check_mode: no
+  register: existing_schleuder_lists
+  changed_when: False
+  tags:
+    - schleuder_lists
+
+- name: "{{ list.name }} | ensure public key of admin is present"
+  copy:
+    src: "schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+    dest: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+    owner: root
+    group: "{{ schleuder_schleuder_user }}"
+    mode: 0640
+  when:
+    - list.admin_pubkey_present|default(True) != False
+    - list.name not in existing_schleuder_lists.stdout
+    - list.state|default('present') != 'absent'
+  tags:
+    - schleuder_lists
+
+# create list without admin public key, if is not present
+- name: "{{ list.name }} | ensure schleuder list is present"
+  shell: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
+  args:
+    chdir: /root
+  when:
+    - list.admin_pubkey_present|default(True) == False
+    - list.name not in existing_schleuder_lists.stdout
+    - list.state|default('present') != 'absent'
+  register: __list_creation
+  tags:
+    - schleuder_lists
+
+# create list with admin public key, if it is present
+- name: "{{ list.name }} | ensure schleuder list is present"
+  shell: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+  args:
+    chdir: /root
+  when:
+    - list.admin_pubkey_present|default(True) != False
+    - list.name not in existing_schleuder_lists.stdout
+    - list.state|default('present') != 'absent'
+  register: __list_creation
+  tags:
+    - schleuder_lists
+
+- name: "{{ list.name }} | ensure dirmngr.conf is present"
+  template:
+    src: schleuder/dirmngr.conf.j2
+    dest: "/var/lib/schleuder/lists/{{  list.name.split('@')[1] }}/{{  list.name.split('@')[0] }}/dirmngr.conf"
+    owner: "{{ schleuder_schleuder_user }}"
+    group: "{{ schleuder_schleuder_user }}"
+    mode: 0600
+  when: schleuder_gpg_use_tor
+  tags:
+    - schleuder_lists
+
+- name: "{{ list.name }} | ensure schleuder list is absent"
+  shell: "schleuder-cli lists delete {{ list.name }} --YES"
+  args:
+    chdir: /root
+  when:
+    - list.name in existing_schleuder_lists.stdout
+    - list.state|default('present') == 'absent'
+  tags:
+    - schleuder_lists
+
+- name: "{{ list.name }} | ensure public-key of admin is absent"
+  file:
+    path: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+    state: absent
+  when:
+    - list.name in existing_schleuder_lists.stdout
+    - list.state|default('present') == 'absent'
+  tags:
+    - schleuder_lists
+
+- name: "{{ list.name }} | send list-key to subscription (admin)"
+  shell: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
+  args:
+    chdir: /root
+  when:
+    - __list_creation.changed
+    - list.admin_pubkey_present|default(True) != False
+    - list.send_list_key|default(True) != False
+    - not schleuder_vagrant_testenvironment|default(False)
+  tags:
+    - schleuder_lists

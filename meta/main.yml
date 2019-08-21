@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  author: systemli
+  description: Role to setup and maintain schleuder software and it's lists
+  company: systemli.org
+  license: GPLv3
+  min_ansible_version: 2.2
+  galaxy_tags:
+    - mail
+    - gpg
+    - schleuder
+    - schleuder-cli
+    - schleuder-web
+  platforms:
+    - name: Debian
+      versions:
+        - stretch
+        - buster
+  notifications:
+    webhooks: https://galaxy.ansible.com/api/v1/notifications/
+
+dependencies:
+  - role: jnv.debian-backports
+    when: ansible_distribution_release == 'stretch'

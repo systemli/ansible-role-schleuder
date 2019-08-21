@@ -1,0 +1,37 @@
+---
+scenario:
+  name: docker
+
+dependency:
+  name: galaxy
+  options:
+    role-file: molecule/default/requirements.yml
+
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian9}-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+    enabled: false
+  playbooks:
+    converge: ../default/playbook.yml
+    verify: ../default/verify.yml
+
+lint:
+  name: yamllint
+  enabled: False
+
+verifier:
+  name: goss
+  directory: ../default/tests/
+  lint:
+    name: yamllint

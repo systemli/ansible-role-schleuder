@@ -1,0 +1,41 @@
+---
+
+- include: schleuder.yml
+  tags:
+    - schleuder
+
+- include: schleuder_cli.yml
+  tags:
+    - schleuder_cli
+  when: schleuder_install_cli
+
+- include: schleuder_web.yml
+  tags:
+    - schleuder_web
+  when: schleuder_install_web
+
+- name: flush handlers to ensure api is setup correct
+  meta: flush_handlers
+
+- name: wait until api is restarted on fresh install
+  wait_for:
+    port: 4443
+    delay: 10
+  when: schleuder_install.changed
+
+- include: schleuder_gitlab_ticket_plugin.yml
+  tags:
+    - schleuder_gitlab_ticket_plugin
+  when: schleuder_install_gitlab_ticket_plugin
+
+- include_tasks: schleuder_lists.yml
+  with_items: "{{ schleuder_lists }}"
+  loop_control:
+    loop_var: list
+  tags:
+    - schleuder_lists
+
+- include: goss.yml
+  tags:
+    - schleuder
+    - goss

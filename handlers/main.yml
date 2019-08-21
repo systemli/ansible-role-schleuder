@@ -1,0 +1,11 @@
+---
+
+- name: restart schleuder-api-daemon
+  service:
+    name: schleuder-api-daemon
+    state: restarted
+
+- name: restart schleuder-web
+  systemd:
+    name: schleuder-web
+    state: restarted

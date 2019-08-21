@@ -1,0 +1,62 @@
+---
+
+- name: install schleuder-gitlab-plugin-gem dependencies
+  apt:
+    pkg:
+      - ruby-gitlab
+      - ruby-httparty
+
+- name: ensure schleuder-gitlab-plugin path present
+  file:
+    path: "{{ schleuder_gitlab_plugin_path }}"
+    owner: "{{ schleuder_schleuder_user }}"
+    group: "{{ schleuder_schleuder_user }}"
+    state: directory
+
+- name: ensure schleuder-gitlab-plugin is latest
+  git:
+    repo: "{{ schleuder_gitlab_plugin_repo }}"
+    dest: "{{ schleuder_gitlab_plugin_path }}"
+    update: "{{ schleuder_gitlab_plugin_git_update }}"
+  become_user: "{{ schleuder_schleuder_user }}"
+  register: __schleuder_gitlab_plugin_repo_clone
+  vars:
+    ansible_ssh_pipelining: True
+
+- name: generate schleuder-gitlab-plugin gemfile from gemspecs
+  command: gem build schleuder-gitlab-ticketing.gemspec
+  args:
+    chdir: "{{ schleuder_gitlab_plugin_path }}"
+    creates: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-0.0.1.gem"
+  become_user: "{{ schleuder_schleuder_user }}"
+  when: __schleuder_gitlab_plugin_repo_clone.changed
+  vars:
+    ansible_ssh_pipelining: True
+
+- name: ensure schleuder-gitlab-plugin-gem is installed from local gem (until gem is released)
+  gem:
+    name: schleuder-gitlab-ticketing
+    gem_source: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-0.0.1.gem"
+    user_install: False
+    state: present
+
+- name: ensure schleuder filter path is present
+  file:
+    path: /usr/local/lib/schleuder/filters/post_decryption
+    state: directory
+    owner: root
+    group: staff
+
+- name: link gitlab-ticketing plugin as schleuder post_decryption filter
+  file:
+    src: /var/lib/gems/2.3.0/gems/schleuder-gitlab-ticketing-0.0.1/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
+    dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
+    state: link
+
+- name: ensure gitlab plugin config is latest
+  template:
+    src: schleuder/gitlab.yml.j2
+    dest: /etc/schleuder/gitlab.yml
+    owner: root
+    group: "{{ schleuder_schleuder_user }}"
+    mode: 0640

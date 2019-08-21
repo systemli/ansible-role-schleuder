@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  roles:
+    - role: ansible-role-schleuder
+  vars:
+    __testing: True
+    # schleuder_install_gitlab_ticket_plugin: True
+    schleuder_gpg_use_tor: True

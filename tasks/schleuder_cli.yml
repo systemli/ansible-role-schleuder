@@ -1,0 +1,24 @@
+---
+
+- name: install schleuder-cli
+  apt:
+    name: schleuder-cli
+    state: 'present'
+    default_release: "{% if ansible_distribution_release == 'stretch' %}{{ ansible_distribution_release }}-backports{% elif ansible_distribution_release == 'buster' %}{{ ansible_distribution_release }}{% endif %}"
+
+- name: ensure /root/.schleuder-cli/ is present
+  file:
+    path: "{{ schleuder_cli_path }}"
+    state: directory
+    owner: "root"
+    group: "{{ schleuder_schleuder_user }}"
+    mode: 0600
+
+- name: ensure schleuder-cli.yml is latest
+  template:
+    src: schleuder-cli/schleuder-cli.yml.j2
+    dest: "{{ schleuder_cli_path }}/schleuder-cli.yml"
+    owner: "root"
+    group: "root"
+    mode: 0600
+  notify: restart schleuder-api-daemon
