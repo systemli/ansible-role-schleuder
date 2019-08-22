@@ -25,3 +25,7 @@ http:
     body:
       - Schleuder
       - Cookies
+
+  https://localhost:4443/status.json:
+    status: 200
+    allow-insecure: True
