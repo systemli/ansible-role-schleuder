@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: schleuder
   author: systemli
   description: Role to setup and maintain schleuder software and it's lists
   company: systemli.org
