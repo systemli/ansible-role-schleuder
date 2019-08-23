@@ -27,7 +27,7 @@
   command: gem build schleuder-gitlab-ticketing.gemspec
   args:
     chdir: "{{ schleuder_gitlab_plugin_path }}"
-    creates: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-0.0.1.gem"
+    creates: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-1.0.0.gem"
   become_user: "{{ schleuder_schleuder_user }}"
   when: __schleuder_gitlab_plugin_repo_clone.changed
   vars:
@@ -36,7 +36,7 @@
 - name: ensure schleuder-gitlab-plugin-gem is installed from local gem (until gem is released)
   gem:
     name: schleuder-gitlab-ticketing
-    gem_source: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-0.0.1.gem"
+    gem_source: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-1.0.0.gem"
     user_install: False
     state: present
 
@@ -49,7 +49,7 @@
 
 - name: link gitlab-ticketing plugin as schleuder post_decryption filter
   file:
-    src: /var/lib/gems/2.3.0/gems/schleuder-gitlab-ticketing-0.0.1/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
+    src: "/var/lib/gems/{% if ansible_distribution_release == 'stretch' %}2.3.0{% elif ansible_distribution_release == 'buster' %}2.5.0{% endif %}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
     dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
     state: link
 

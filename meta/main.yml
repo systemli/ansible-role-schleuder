@@ -9,8 +9,8 @@ galaxy_info:
     - mail
     - gpg
     - schleuder
-    - schleuder-cli
-    - schleuder-web
+    - schleudercli
+    - schleuderweb
   platforms:
     - name: Debian
       versions:
