@@ -1,0 +1,31 @@
+---
+
+package:
+  schleuder:
+    installed: true
+  schleuder-cli:
+    installed: true
+
+port:
+  tcp:3000:
+    listening: true
+
+service:
+  schleuder-web:
+    enabled: true
+    running: true
+
+  schleuder-api-daemon:
+    enabled: true
+    running: true
+
+http:
+  http://localhost:3000/login/cookiesrequired:
+    status: 200
+    body:
+      - Schleuder
+      - Cookies
+
+  https://localhost:4443/status.json:
+    status: 200
+    allow-insecure: True

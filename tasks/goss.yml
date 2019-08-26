@@ -12,4 +12,4 @@
     dest: "{{ goss_test_directory }}/test_{{ item }}.yml"
   when: dir.stat is defined and dir.stat.exists and dir.stat.isdir
   with_items:
-    - prosody
+    - schleuder
