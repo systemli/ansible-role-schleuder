@@ -27,7 +27,7 @@ provisioner:
   become: true
   lint:
     name: ansible-lint
-    enabled: True
+    enabled: False
 
 lint:
   name: yamllint

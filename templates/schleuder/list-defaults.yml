@@ -87,7 +87,7 @@ bounces_drop_all: {{ schleuder_bounces_drop_all }}
 # Drop bounces if they match one of these headers. Must be a hash, keys
 # and values are case insensitive.
 bounces_drop_on_headers:
-{% for key, value in schleuder_bounces_drop_on_headers.iteritems() %}
+{% for key, value in schleuder_bounces_drop_on_headers.items() %}
   {{ key }}: {{ value }}
 {% endfor %}
 

@@ -5,7 +5,7 @@ production:
   pool: 5
   timeout: 5000
 {% else %}
-  {% for key, value in schleuder_web_database.production.iteritems() %}
+  {% for key, value in schleuder_web_database.production.items() %}
   {{ key }}: {{ value }}
   {% endfor %}
 {% endif %}

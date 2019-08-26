@@ -28,13 +28,13 @@ lists:
 {% for lists in schleuder_gitlab_lists|sort %}
 {%    for key,value in lists.items() %}
   {{ key }}:
-{%      for key, value in value.iteritems()|sort %}
+{%      for key, value in value.items()|sort %}
 {% if key == 'project' or key == 'namespace' or key == 'ticket_prefix'%}
     {{ key }}: {{ value }}
 {% endif %}
 {% if key == 'gitlab' %}
     {{ key }}:
-{%      for key, value in value.iteritems()|sort %}
+{%      for key, value in value.items()|sort %}
       {{ key }}: {{ value }}
 {%      endfor %}
 {% endif %}

@@ -46,7 +46,7 @@ superadmin: {{ schleuder_superadmin }}
 
 # For these options see documentation for ActionMailer::smtp_settings, e.g. <http://api.rubyonrails.org/classes/ActionMailer/Base.html>.
 smtp_settings:
-{% for key, value in schleuder_smtp_settings.iteritems() %}
+{% for key, value in schleuder_smtp_settings.items() %}
   {{ key }}: {{ value }}
 {% endfor %}
   #domain:
@@ -59,12 +59,12 @@ smtp_settings:
 # The database to use. Unless you want to run the tests you only need the `production`-section.
 database:
   production:
-{% for key, value in schleuder_database.production.iteritems() %}
+{% for key, value in schleuder_database.production.items() %}
     {{ key }}: {{ value }}
 {% endfor %}
 
 api:
-{% for key, value in schleuder_api.iteritems() %}
+{% for key, value in schleuder_api.items() %}
   {{ key }}: {{ value }}
 {% endfor %}
   # List of api_keys to allow access to the API.
