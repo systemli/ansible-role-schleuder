@@ -129,10 +129,10 @@ Role Variables
     
     ### schleuder/list-defaults.yml.j2
     schleuder_send_encrypted_only: "true"
-    schleuder_receive_encrypted_only: "false"
+    schleuder_receive_encrypted_only: "true"
     schleuder_receive_signed_only: "false"
     schleuder_receive_authenticated_only: "false"
-    schleuder_receive_from_subscribed_emailaddresses_only: "false"
+    schleuder_receive_from_subscribed_emailaddresses_only: "true"
     schleuder_receive_admin_only: "false"
     schleuder_headers_to_meta:
       - from
