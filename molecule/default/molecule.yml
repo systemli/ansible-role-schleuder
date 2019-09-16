@@ -29,10 +29,6 @@ provisioner:
     name: ansible-lint
     enabled: False
 
-lint:
-  name: yamllint
-  enabled: False
-
 verifier:
   name: goss
   lint:

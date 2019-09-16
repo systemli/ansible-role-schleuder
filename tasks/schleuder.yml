@@ -81,7 +81,7 @@
 
 - name: ensure list-defaults.yml is latest
   template:
-    src: schleuder/list-defaults.yml
+    src: schleuder/list-defaults.yml.j2
     dest: "/etc/schleuder/list-defaults.yml"
     owner: "root"
     group: "{{ schleuder_schleuder_user }}"

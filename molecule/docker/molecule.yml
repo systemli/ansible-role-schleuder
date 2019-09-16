@@ -26,10 +26,6 @@ provisioner:
     converge: ../default/playbook.yml
     verify: ../default/verify.yml
 
-lint:
-  name: yamllint
-  enabled: False
-
 verifier:
   name: goss
   directory: ../default/tests/
