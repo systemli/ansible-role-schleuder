@@ -4,7 +4,7 @@
   apt:
     name: schleuder-cli
     state: 'present'
-    default_release: "{% if ansible_distribution_release == 'stretch' %}{{ ansible_distribution_release }}-backports{% elif ansible_distribution_release == 'buster' %}{{ ansible_distribution_release }}{% endif %}"
+    default_release: "{{ ansible_distribution_release if ansible_distribution_release != 'stretch' else 'stretch-backports' }}"
 
 - name: ensure /root/.schleuder-cli/ is present
   file:

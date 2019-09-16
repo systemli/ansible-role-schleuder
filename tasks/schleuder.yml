@@ -19,13 +19,14 @@
   apt:
     name: "{{ __schleuder_packages }}"
     state: 'present'
-    default_release: "{% if ansible_distribution_release == 'stretch' %}{{ ansible_distribution_release }}-backports{% elif ansible_distribution_release == 'buster' %}{{ ansible_distribution_release }}{% endif %}"
+    default_release: "{{ ansible_distribution_release if ansible_distribution_release != 'stretch' else 'stretch-backports' }}"
   vars:
     __schleuder_packages:
       - schleuder
   register: schleuder_install
 
 - name: register schleuder tls fingerprint
+  become: true
   become_user: "{{ schleuder_schleuder_user }}"
   command: /usr/bin/schleuder cert fingerprint
   register: schleuder_tls_fingerprint_tmp
@@ -39,6 +40,7 @@
     schleuder_tls_fingerprint: "{{ schleuder_tls_fingerprint_tmp.stdout.split(' ')[-1] }}"
 
 - name: generate new schleuder api key (when it does already exists)
+  become: true
   become_user: "{{ schleuder_schleuder_user }}"
   command: /usr/bin/schleuder new_api_key
   register: schleuder_cli_install_api_key
@@ -59,7 +61,7 @@
   register: stat_schleuder_cli_path
 
 - name: register existing schleuder api key
-  shell: "grep api_key {{ schleuder_cli_path }}/schleuder-cli.yml | cut -d' ' -f2"
+  shell: "executable=/bin/bash set -o pipefail && grep api_key {{ schleuder_cli_path }}/schleuder-cli.yml | cut -d' ' -f2"
   register: schleuder_cli_existing_api_key
   check_mode: no
   changed_when: False

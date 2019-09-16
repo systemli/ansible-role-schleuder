@@ -3,7 +3,7 @@
 # a small wrapper to manage init member keys and a schleuder_list
 
 - name: "{{ list.name }} | register existing schleuder lists"
-  shell: "schleuder-cli lists list"
+  command: "schleuder-cli lists list"
   args:
     chdir: /root
   check_mode: no
@@ -20,7 +20,7 @@
     group: "{{ schleuder_schleuder_user }}"
     mode: 0640
   when:
-    - list.admin_pubkey_present|default(True) != False
+    - list.admin_pubkey_present|default(True)
     - list.name not in existing_schleuder_lists.stdout
     - list.state|default('present') != 'absent'
   tags:
@@ -28,11 +28,11 @@
 
 # create list without admin public key, if is not present
 - name: "{{ list.name }} | ensure schleuder list is present"
-  shell: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
+  command: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
   args:
     chdir: /root
   when:
-    - list.admin_pubkey_present|default(True) == False
+    - not list.admin_pubkey_present|default(True)
     - list.name not in existing_schleuder_lists.stdout
     - list.state|default('present') != 'absent'
   register: __list_creation
@@ -41,11 +41,11 @@
 
 # create list with admin public key, if it is present
 - name: "{{ list.name }} | ensure schleuder list is present"
-  shell: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+  command: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
   args:
     chdir: /root
   when:
-    - list.admin_pubkey_present|default(True) != False
+    - list.admin_pubkey_present|default(True)
     - list.name not in existing_schleuder_lists.stdout
     - list.state|default('present') != 'absent'
   register: __list_creation
@@ -64,7 +64,7 @@
     - schleuder_lists
 
 - name: "{{ list.name }} | ensure schleuder list is absent"
-  shell: "schleuder-cli lists delete {{ list.name }} --YES"
+  command: "schleuder-cli lists delete {{ list.name }} --YES"
   args:
     chdir: /root
   when:
@@ -84,13 +84,13 @@
     - schleuder_lists
 
 - name: "{{ list.name }} | send list-key to subscription (admin)"
-  shell: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
+  command: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
   args:
     chdir: /root
   when:
     - __list_creation.changed
-    - list.admin_pubkey_present|default(True) != False
-    - list.send_list_key|default(True) != False
+    - list.admin_pubkey_present|default(True)
+    - list.send_list_key|default(True)
     - not schleuder_vagrant_testenvironment|default(False)
   tags:
     - schleuder_lists

@@ -41,6 +41,7 @@
     dest: "{{ schleuder_schleuder_web_path }}"
     update: "{{ schleuder_schleuder_web_git_update }}"
     force: True
+  become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
@@ -68,6 +69,7 @@
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
@@ -82,6 +84,7 @@
   command: rake secret
   changed_when: False
   check_mode: no
+  become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
@@ -91,7 +94,7 @@
   when: not stat_schleuder_web_systemd_file.stat.exists
 
 - name: register existing schleuder-web secret_key_base
-  shell: "grep SECRET_KEY_BASE {{ schleuder_schleuder_web_environment_vars_path }} | cut -d'=' -f2"
+  shell: "executable=/bin/bash set -o pipefail && grep SECRET_KEY_BASE {{ schleuder_schleuder_web_environment_vars_path }} | cut -d'=' -f2"
   register: schleuder_web_existing_secret_key_base_tmp
   check_mode: no
   changed_when: False
@@ -116,6 +119,7 @@
   command: "bundle exec rake db:setup RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
@@ -125,6 +129,7 @@
   command: "bundle exec rake assets:precompile RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
