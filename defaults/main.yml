@@ -136,6 +136,8 @@ schleuder_web_database:
 ### schleuder-web/schleuder-web.yml
 schleuder_web_web_hostname: example.org
 schleuder_web_mailer_from: noreply@example.org
+schleuder_web_superadmins:
+  - "{{ schleuder_superadmin }}"
 
 ### schleuder/gitlab.yml
 # global settings

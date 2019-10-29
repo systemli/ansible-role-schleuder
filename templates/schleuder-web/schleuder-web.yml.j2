@@ -15,6 +15,10 @@ defaults: &defaults
     port: <%= ENV["SCHLEUDER_API_PORT"] || 4443 %>
     tls_fingerprint: <%= ENV["SCHLEUDER_TLS_FINGERPRINT"] %>
   api_key: <%= ENV["SCHLEUDER_API_KEY"] %>
+  superadmins:
+{% for account in schleuder_web_superadmins %}
+    - {{ account }}
+{% endfor %}
 
 test:
   <<: *defaults

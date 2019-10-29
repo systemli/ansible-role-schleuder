@@ -145,6 +145,17 @@
   register: schleuder_web_systemd
   notify: restart schleuder-web
 
+- name: replace default superadmin setting for schleuder-web
+  replace:
+    path: "{{ schleuder_schleuder_web_path }}/app/models/account.rb"
+    after: 'def superadmin?'
+    regexp: '^(\s*)(self\.email\s*==\s*.*)$'
+    replace: '\1#\2\n\1Array(Conf.superadmins).include?(self.email)'
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0755
+  notify: restart schleuder-web
+
 - name: ensure schleuder-web systemd unit file is latest
   template:
     src: schleuder-web/systemd/system/schleuder-web.service.j2
