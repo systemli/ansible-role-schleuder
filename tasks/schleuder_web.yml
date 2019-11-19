@@ -125,6 +125,13 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed
 
+- name: ensure schleuder-web database permissions
+  file:
+    path: "{{ schleuder_schleuder_web_path }}/db/production.sqlite"
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0600
+
 - name: precompile schleuder-web assets (when repo changed)
   command: "bundle exec rake assets:precompile RAILS_ENV=production"
   args:
