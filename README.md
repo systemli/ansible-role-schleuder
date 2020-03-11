@@ -1,7 +1,7 @@
 ansible-role-schleuder
 =================
 
-[![Build Status](https://travis-ci.org/systemli/ansible-role-schleuder.svg)](https://travis-ci.org/systemli/ansible-role-schleuder)
+[![Build Status](https://travis-ci.org/systemli/ansible-role-schleuder.svg?branch=master)](https://travis-ci.org/systemli/ansible-role-schleuder)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-schleuder-blue.svg)](https://galaxy.ansible.com/systemli/schleuder/)
 
 

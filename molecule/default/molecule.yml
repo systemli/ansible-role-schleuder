@@ -1,7 +1,4 @@
 ---
-scenario:
-  name: default
-
 driver:
   name: vagrant
   provider:
@@ -22,14 +19,11 @@ platforms:
     instance_raw_config_args:
       - "vm.network 'forwarded_port', guest: 3000, host: 3000"
 
+lint: yamllint .
+
 provisioner:
   name: ansible
   become: true
-  lint:
-    name: ansible-lint
-    enabled: False
 
 verifier:
   name: goss
-  lint:
-    name: yamllint
