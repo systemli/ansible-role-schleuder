@@ -1,0 +1,84 @@
+diff --git a/schleuder.rb b/schleuder.rb
+index 90be190..71ef55f 100644
+--- a/schleuder.rb
++++ b/schleuder.rb
+@@ -3,7 +3,7 @@
+ #
+ # this should ensure we are able to parse most incoming
+ # plain text mails in different charsets.
+-Encoding.default_external = Encoding::ASCII_8BIT
++Encoding.default_external = Encoding::UTF_8
+ 
+ # Stdlib
+ require 'fileutils'
+diff --git a/schleuder/cli.rb b/schleuder/cli.rb
+index 4b96a2c..25d2953 100644
+--- a/schleuder/cli.rb
++++ b/schleuder/cli.rb
+@@ -1,6 +1,7 @@
+ require 'thor'
+ require 'yaml'
+ require 'gpgme'
++require 'charlock_holmes'
+ 
+ require_relative '../schleuder'
+ require 'schleuder/cli/subcommand_fix'
+diff --git a/schleuder/runner.rb b/schleuder/runner.rb
+index 97ff52c..50b8a73 100644
+--- a/schleuder/runner.rb
++++ b/schleuder/runner.rb
+@@ -5,8 +5,31 @@ module Schleuder
+       return error if error
+ 
+       logger.info "Parsing incoming email."
++
++      # is it valid utf-8?
++      msg_scrubbed = false
++      unless msg.valid_encoding?
++        logger.warn "Converting message due to invalid characters"
++        detection = CharlockHolmes::EncodingDetector.detect(msg)
++        begin
++          msg = CharlockHolmes::Converter.convert(msg, detection[:encoding], 'UTF-8')
++        rescue ArgumentError
++          # it looks like even icu wasn't able to convert
++          # so we scrub the invalid characters to be able to
++          # at least parse the message somehow. Though this might
++          # result in data loss.
++          logger.warn "Scrubing message due to invalid characters"
++          msg = msg.scrub
++          msg_scrubbed = true
++        end
++      end
++
+       @mail = Mail.create_message_to_list(msg, recipient, list)
+ 
++      if msg_scrubbed
++        @mail.add_pseudoheader(:note, I18n.t("pseudoheaders.scrubbed_message"))
++      end
++
+       error = run_filters('pre')
+       return error if error
+
+diff --git a/schleuder/mail/message.rb b/schleuder/mail/message.rb
+index 277bbf8..25c605a 100644
+--- a/schleuder/mail/message.rb
++++ b/schleuder/mail/message.rb
+@@ -247,11 +247,11 @@ module Mail
+       # decide itself how to encode, it works. If we don't, some
+       # character-sequences are not properly re-encoded.
+       part.content_transfer_encoding = nil
+-      # Make the converted strings (now UTF-8) match what mime-part's headers say,
+-      # fall back to US-ASCII if none is set.
+-      # https://tools.ietf.org/html/rfc2046#section-4.1.2
+-      # -> Default charset is US-ASCII
+-      part.body = lines.compact.join.encode(part.charset||'US-ASCII')
++
++      # Set the right charset on the now parsed body
++      new_body = lines.compact.join
++      part.charset = new_body.encoding.to_s
++      part.body = new_body
+ 
+       @keywords
+     end
+-- 
+2.20.1

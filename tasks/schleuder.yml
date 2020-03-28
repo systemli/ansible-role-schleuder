@@ -22,6 +22,8 @@
     default_release: "{{ ansible_distribution_release if ansible_distribution_release != 'stretch' else 'stretch-backports' }}"
   vars:
     __schleuder_packages:
+      - patch
+      - ruby-charlock-holmes
       - schleuder
   register: schleuder_install
 
@@ -129,3 +131,17 @@
     group: "{{ schleuder_schleuder_user }}"
     mode: 0600
   when: schleuder_gpg_use_tor
+
+- name: fix encoding problems (code)
+  patch:
+    src: fix-encoding-problems-code.patch
+    basedir: /usr/lib/ruby/vendor_ruby
+    backup: yes
+    strip: 1
+
+- name: fix encoding problems (locales)
+  patch:
+    src: fix-encoding-problems-locales.patch
+    basedir: /usr/share/schleuder/locales
+    backup: yes
+    strip: 1
