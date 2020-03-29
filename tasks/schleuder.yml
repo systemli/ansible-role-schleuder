@@ -91,10 +91,6 @@
     group: "{{ schleuder_schleuder_user }}"
     mode: 0640
 
-- name: apply schleuder config
-  command: /usr/bin/schleuder install
-  when: schleuder_install.changed
-
 - name: check if schleuder api is reachable
   uri:
     url: "https://{{ schleuder_api.host }}:{{ schleuder_api.port }}/status.json"
