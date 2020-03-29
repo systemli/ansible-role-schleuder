@@ -19,7 +19,6 @@
       - g++
       - make
       - libsqlite3-dev
-      - bundler
 
 - name: ensure /var/www is present
   file:
@@ -64,8 +63,15 @@
     group: "{{ schleuder_schleuder_web_user }}"
     mode: 0640
 
+- name: install bundler (when repo changed)
+  command: "gem install bundler"
+  check_mode: no
+  vars:
+    ansible_ssh_pipelining: True
+  when: __schleuder_repo_clone.changed
+
 - name: install bundle (when repo changed)
-  command: "bundle install --without development --path {{ schleuder_schleuder_web_home }}/.gem"
+  command: "/usr/local/bin/bundle install --without development --path {{ schleuder_schleuder_web_home }}/.gem"
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
