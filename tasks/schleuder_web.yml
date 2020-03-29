@@ -121,15 +121,46 @@
     schleuder_schleuder_web_secret_key_base: "{{ schleuder_web_existing_secret_key_base }}"
   when: stat_schleuder_web_systemd_file.stat.exists
 
+- name: check if the database was already set up
+  stat:
+    path: "{{ schleuder_schleuder_web_path }}/{{ schleuder_web_database.production.database }}"
+  register: __schleuder_schleuder_web_database
+
+- name: prepare schleuder-web database environment (when repo changed)
+  command: "bundle exec rails db:environment:set RAILS_ENV=production"
+  args:
+    chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
+  become_user: "{{ schleuder_schleuder_web_user }}"
+  environment:
+    SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
+  vars:
+    ansible_ssh_pipelining: True
+  when: __schleuder_repo_clone.changed
+
 - name: setup schleuder-web database (when repo changed)
   command: "bundle exec rake db:setup RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
+  environment:
+    SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed and not __schleuder_schleuder_web_database.stat.exists
+
+- name: migrate schleuder-web database (when repo changed)
+  command: "bundle exec rake db:migrate RAILS_ENV=production"
+  args:
+    chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
+  become_user: "{{ schleuder_schleuder_web_user }}"
+  environment:
+    SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
+  vars:
+    ansible_ssh_pipelining: True
+  when: __schleuder_repo_clone.changed and __schleuder_schleuder_web_database.stat.exists
 
 - name: ensure schleuder-web database permissions
   file:
@@ -144,6 +175,8 @@
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
+  environment:
+    SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed
