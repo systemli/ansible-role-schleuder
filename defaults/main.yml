@@ -30,7 +30,6 @@ schleuder_schleuder_web_repo: https://0xacab.org/schleuder/schleuder-web
 schleuder_schleuder_web_home: "/var/www/schleuder-web"
 schleuder_schleuder_web_user: schleuder-web
 schleuder_schleuder_web_path: "{{ schleuder_schleuder_web_home }}/schleuder-web"
-schleuder_schleuder_web_git_update: False
 schleuder_schleuder_web_systemd_path: "/etc/systemd/system/schleuder-web.service"
 schleuder_schleuder_web_environment_vars_path: "/etc/default/schleuder-web"
 # set to false will make rails server listen on localhost only
@@ -138,6 +137,8 @@ schleuder_web_web_hostname: example.org
 schleuder_web_mailer_from: noreply@example.org
 schleuder_web_superadmins:
   - "{{ schleuder_superadmin }}"
+
+schleuder_web_version: debian/buster/0.0.1
 
 ### schleuder/gitlab.yml
 # global settings

@@ -34,17 +34,84 @@
     home: "{{ schleuder_schleuder_web_home }}"
     shell: /bin/false
 
-- name: ensure schleuder-web is latest
+# TODO: ansible >= 2.9 provides a 'gpg_whitelist' option to the git module,
+# which allows to specify a list of trusted GPG key fingerprints to compare to
+# the GPG key fingerprint which signed the git tag.
+
+- name: ensure schleuder-web gnupg home exists
+  file:
+    path: "{{ schleuder_schleuder_web_home }}/.gnupg"
+    state: directory
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0700
+
+- name: ensure schleuder-web upstream gpg signing key is present
+  copy:
+    src: var/www/schleuder-web/.gnupg/pubring.gpg
+    dest: "{{ schleuder_schleuder_web_home }}/.gnupg/pubring.gpg"
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0600
+
+- name: check if schleuder-web dir exists
+  stat:
+    path: "{{ schleuder_schleuder_web_path }}"
+  register: __schleuder_schleuder_web_path
+
+- name: check if schleuder-web configs exist
+  stat:
+    path: "{{ schleuder_schleuder_web_home }}/config/{{ item }}"
+  register: __schleuder_schleuder_web_configs
+  with_items:
+    - database.yml
+    - schleuder-web.yml
+
+# TODO: handle the configuration in a more straightforward way, once upstream
+# provides a sane way to do so.
+
+- name: ensure schleuder-web config dir exists
+  file:
+    path: "{{ schleuder_schleuder_web_home }}/config"
+    state: directory
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0700
+
+- name: ensure schleuder-web configs are backed up
+  command: "cp --preserve=all {{ schleuder_schleuder_web_path }}/config/{{ item }} {{ schleuder_schleuder_web_home }}/config"
+  changed_when: false
+  when: __schleuder_schleuder_web_path.stat.exists
+  with_items:
+    - database.yml
+    - schleuder-web.yml
+
+- name: ensure schleuder-web local checkout is pristine
+  command: git reset --hard HEAD --quiet
+  args:
+    chdir: "{{ schleuder_schleuder_web_path }}"
+  changed_when: false
+  when: __schleuder_schleuder_web_path.stat.exists
+
+- name: ensure schleuder-web checkout of specified version
   git:
     repo: "{{ schleuder_schleuder_web_repo }}"
     dest: "{{ schleuder_schleuder_web_path }}"
-    update: "{{ schleuder_schleuder_web_git_update }}"
     force: True
+    verify_commit: True
+    version: "{{ schleuder_web_version }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
   register: __schleuder_repo_clone
+
+- name: ensure schleuder-web configs are restored
+  command: "cp --preserve=all {{ item.stat.path }} {{ schleuder_schleuder_web_path }}/config/"
+  changed_when: false
+  when: item.stat.exists
+  with_items:
+    - "{{ __schleuder_schleuder_web_configs.results }}"
 
 - name: ensure schleuder-web web config is latest
   template:
