@@ -262,12 +262,11 @@ On the local environment you can easily test the role with
 molecule test
 ```
 
-This will spin up two virtual machines with Debian Stretch and Debian Buster. Afterwards you can connect to the Schleuder
+This will spin up a virtual machine with Debian Buster. Afterwards you can connect to the Schleuder
 web interface via: 
 
 ```
-Stretch: http://localhost:3001
-Buster: http://localhost:3000
+http://localhost:3000
 ```
 
 

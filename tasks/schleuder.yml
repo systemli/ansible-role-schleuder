@@ -19,7 +19,6 @@
   apt:
     name: "{{ __schleuder_packages }}"
     state: 'present'
-    default_release: "{{ ansible_distribution_release if ansible_distribution_release != 'stretch' else 'stretch-backports' }}"
   vars:
     __schleuder_packages:
       - schleuder
