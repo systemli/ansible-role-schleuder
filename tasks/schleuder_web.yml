@@ -34,12 +34,34 @@
     home: "{{ schleuder_schleuder_web_home }}"
     shell: /bin/false
 
-- name: ensure schleuder-web is latest
+
+# TODO: ansible >= 2.9 provides a 'gpg_whitelist' option to the git module,
+# which allows to specify a list of trusted GPG fingerprints to compare to the
+# fingerprint of the GPG-signed commit.
+
+- name: ensure schleuder-web gnupg home exists
+  file:
+    path: "{{ schleuder_schleuder_web_home }}/.gnupg"
+    state: directory
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0700
+
+- name: ensure schleuder-web upstream gpg signing key is present
+  copy:
+    src: var/www/schleuder-web/.gnupg/pubring.gpg
+    dest: "{{ schleuder_schleuder_web_home }}/.gnupg/pubring.gpg"
+    owner: "{{ schleuder_schleuder_web_user }}"
+    group: "{{ schleuder_schleuder_web_user }}"
+    mode: 0600
+
+- name: ensure schleuder-web checkout of specified version
   git:
     repo: "{{ schleuder_schleuder_web_repo }}"
     dest: "{{ schleuder_schleuder_web_path }}"
-    update: "{{ schleuder_schleuder_web_git_update }}"
     force: True
+    verify_commit: True
+    version: "{{ schleuder_web_version }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
