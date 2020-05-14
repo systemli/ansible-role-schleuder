@@ -120,7 +120,6 @@
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
     mode: 0640
-  notify: restart schleuder-web
 
 - name: ensure schleuder-web database config is latest
   template:
@@ -256,7 +255,6 @@
     group: "{{ schleuder_schleuder_web_user }}"
     mode: 0600
   register: schleuder_web_systemd
-  notify: restart schleuder-web
 
 - name: ensure schleuder-web systemd unit file is latest
   template:
@@ -265,18 +263,14 @@
     owner: root
     group: root
   register: schleuder_web_systemd
-  notify: restart schleuder-web
 
-- name: enable schleuder-web service on boot
-  systemd:
-    name: schleuder-web
-    enabled: yes
-  when: schleuder_web_systemd.changed
-
-- name: reload systemd
+- name: ensure schleuder-web systemd service is restarted and enabled
   systemd:
     daemon_reload: yes
-  when: schleuder_web_systemd.changed
+    name: schleuder-web
+    enabled: yes
+    state: restarted
+  when: __schleuder_repo_clone.changed or schleuder_web_systemd.changed
 
 - name: ensure schleuder-web is up and running
   command: systemctl is-active schleuder-web
