@@ -277,3 +277,7 @@
   systemd:
     daemon_reload: yes
   when: schleuder_web_systemd.changed
+
+- name: ensure schleuder-web is up and running
+  command: systemctl is-active schleuder-web
+  changed_when: false
