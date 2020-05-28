@@ -51,7 +51,7 @@ Role Variables
     ### schleuder vars:
     schleuder_schleuder_user: "schleuder"
     schleuder_gpg_use_tor: True
-    schleuder_gpg_tor_keyserver: "hkp://jirk5u4osbsr34t5.onion"
+    schleuder_gpg_tor_keyserver: "hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion"
     schleuder_admin_keys_path: "/var/lib/schleuder/adminkeys"
     
     schleuder_lists: []
@@ -95,7 +95,7 @@ Role Variables
     schleuder_plugins_dir: "/etc/schleuder/plugins"
     schleuder_filters_dir: "/usr/local/lib/schleuder/filters"
     schleuder_log_level: "warn"
-    schleuder_keyserver: "hkps://hkps.pool.sks-keyservers.net"
+    schleuder_keyserver: "hkps://keys.openpgp.org"
     schleuder_superadmin: "root@localhost"
     schleuder_smtp_settings:
       address: localhost
