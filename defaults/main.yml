@@ -138,7 +138,7 @@ schleuder_web_mailer_from: noreply@example.org
 schleuder_web_superadmins:
   - "{{ schleuder_superadmin }}"
 
-schleuder_web_version: debian/buster/0.0.2
+schleuder_web_version: debian/buster/0.0.3
 
 ### schleuder/gitlab.yml
 # global settings
