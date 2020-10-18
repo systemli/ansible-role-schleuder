@@ -8,7 +8,7 @@ env:
 
 install:
   # Install test dependencies.
-  - pip install molecule[docker,goss] yamllint
+  - python3 -m pip install molecule[docker,goss] yamllint
 
 script:
   - molecule test -s docker
