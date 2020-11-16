@@ -1,7 +1,7 @@
 ansible-role-schleuder
 =================
 
-[![Build Status](https://travis-ci.org/systemli/ansible-role-schleuder.svg?branch=master)](https://travis-ci.org/systemli/ansible-role-schleuder)
+[![Build Status](https://github.com/systemli/ansible-role-schleuder/workflows/Molecule/badge.svg?branch=master)](https://github.com/systemli/ansible-role-schleuder/actions?query=workflow%3AMolecule)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-schleuder-blue.svg)](https://galaxy.ansible.com/systemli/schleuder/)
 
 
@@ -252,15 +252,19 @@ Extended Variables Example
 Testing & Development
 ---------------------
 
-For developing and testing the role we use Travis CI and [Molecule](https://molecule.readthedocs.io/en/stable/) with Vagrant.
+Tests
+-----
 
-Requires Molecule, Vagrant and `python-vagrant` to be installed.
+For developing and testing the role we use Github Actions, Molecule, and Vagrant. On the local environment you can easily test the role with
 
-On the local environment you can easily test the role with
+Run local tests with:
 
 ```
-molecule test
+molecule test 
 ```
+
+Requires Molecule, Vagrant and `python-vagrant` to be installed.For developing and testing the role we use Travis CI, Molecule and Vagrant. On the local environment you can easily test the role with
+
 
 This will spin up a virtual machine with Debian Buster. Afterwards you can connect to the Schleuder
 web interface via: 
