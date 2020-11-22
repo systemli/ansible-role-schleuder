@@ -14,7 +14,7 @@ This role will setup [schleuder](https://0xacab.org/schleuder/schleuder),
 [schleuder-cli](https://0xacab.org/schleuder/schleuder-cli), 
 [schleuder-web](https://0xacab.org/schleuder/schleuder-web) by default.
 
-The web interface is accessible via localhost:3000 and you can login with 
+The web interface is accessible via localhost:3000 and you can log in with 
 schleuders default credentials ("root@localhost" - "slingit!"). 
 
 Additionally you can install the schleuder-gitlab-ticketing-plugin and hook

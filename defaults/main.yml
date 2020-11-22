@@ -27,6 +27,7 @@ schleuder_lists: []
 
 ### schleuder-web vars:
 schleuder_schleuder_web_repo: https://0xacab.org/schleuder/schleuder-web
+schleuder_schleuder_web_git_update: False
 schleuder_schleuder_web_home: "/var/www/schleuder-web"
 schleuder_schleuder_web_user: schleuder-web
 schleuder_schleuder_web_path: "{{ schleuder_schleuder_web_home }}/schleuder-web"
