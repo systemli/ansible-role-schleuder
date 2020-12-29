@@ -1,7 +1,7 @@
 ansible-role-schleuder
 =================
 
-[![Build Status](https://github.com/systemli/ansible-role-schleuder/workflows/Molecule/badge.svg?branch=master)](https://github.com/systemli/ansible-role-schleuder/actions?query=workflow%3AIntegration)
+[![Build Status](https://github.com/systemli/ansible-role-schleuder/workflows/Integration/badge.svg?branch=master)](https://github.com/systemli/ansible-role-schleuder/actions?query=workflow%3AIntegration)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-schleuder-blue.svg)](https://galaxy.ansible.com/systemli/schleuder/)
 
 
