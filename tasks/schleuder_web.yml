@@ -59,44 +59,20 @@
     path: "{{ schleuder_schleuder_web_path }}"
   register: __schleuder_schleuder_web_path
 
-- name: check if schleuder-web configs exist
-  stat:
-    path: "{{ schleuder_schleuder_web_home }}/config/{{ item }}"
-  register: __schleuder_schleuder_web_configs
-  with_items:
-    - database.yml
-    - schleuder-web.yml
-
-# TODO: handle the configuration in a more straightforward way, once upstream
-# provides a sane way to do so.
-
-- name: ensure schleuder-web config dir exists
-  file:
-    path: "{{ schleuder_schleuder_web_home }}/config"
-    state: directory
-    owner: "{{ schleuder_schleuder_web_user }}"
-    group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0700
-
-- name: ensure schleuder-web configs are backed up
-  command: "cp --preserve=all {{ schleuder_schleuder_web_path }}/config/{{ item }} {{ schleuder_schleuder_web_home }}/config"
-  changed_when: false
-  when: __schleuder_schleuder_web_path.stat.exists
-  with_items:
-    - database.yml
-    - schleuder-web.yml
-
 - name: ensure schleuder-web local checkout is pristine
   command: git reset --hard HEAD --quiet
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   changed_when: false
-  when: __schleuder_schleuder_web_path.stat.exists
+  when:
+    - __schleuder_schleuder_web_path.stat.exists
+    - not __testing
 
 - name: ensure schleuder-web checkout of specified version
   git:
     repo: "{{ schleuder_schleuder_web_repo }}"
     dest: "{{ schleuder_schleuder_web_path }}"
+    update: "{{ schleuder_schleuder_web_git_update }}"
     force: True
     verify_commit: True
     version: "{{ schleuder_web_version }}"
@@ -105,13 +81,6 @@
   vars:
     ansible_ssh_pipelining: True
   register: __schleuder_repo_clone
-
-- name: ensure schleuder-web configs are restored
-  command: "cp --preserve=all {{ item.stat.path }} {{ schleuder_schleuder_web_path }}/config/"
-  changed_when: false
-  when: item.stat.exists
-  with_items:
-    - "{{ __schleuder_schleuder_web_configs.results }}"
 
 - name: ensure schleuder-web web config is latest
   template:
@@ -128,6 +97,13 @@
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
     mode: 0640
+
+- name: ensure populated schleuder-web configs are backed up when running in testing
+  command: "cp --preserve=all {{ schleuder_schleuder_web_path }}/config/{{ item }} {{ schleuder_schleuder_web_home }}/config"
+  changed_when: false
+  with_items:
+    - database.yml
+    - schleuder-web.yml
 
 - name: install bundler (when repo changed)
   command: "gem install bundler"
@@ -272,6 +248,15 @@
     state: restarted
   when: __schleuder_repo_clone.changed or schleuder_web_systemd.changed
 
+- name: register status of schleuder web
+  command: systemctl status -l schleuder-web
+  register: schleuder_web_systemd_output
+  changed_when: False
+
+- name: debug status of schleuder web
+  debug:
+    msg: "{{ schleuder_web_systemd_output.stdout_lines }}"
+
 - name: ensure schleuder-web is up and running
-  command: systemctl is-active schleuder-web
+  command: systemctl is-active --quiet schleuder-web
   changed_when: false

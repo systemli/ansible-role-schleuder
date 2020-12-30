@@ -27,6 +27,7 @@ schleuder_lists: []
 
 ### schleuder-web vars:
 schleuder_schleuder_web_repo: https://0xacab.org/schleuder/schleuder-web
+schleuder_schleuder_web_git_update: False
 schleuder_schleuder_web_home: "/var/www/schleuder-web"
 schleuder_schleuder_web_user: schleuder-web
 schleuder_schleuder_web_path: "{{ schleuder_schleuder_web_home }}/schleuder-web"
@@ -139,6 +140,9 @@ schleuder_web_superadmins:
   - "{{ schleuder_superadmin }}"
 
 schleuder_web_version: debian/buster/0.0.3
+
+schleuder_schleuder_web_api_host: "{{ schleuder_api.host }}"
+schleuder_schleuder_web_api_port: "{{ schleuder_api.port }}"
 
 ### schleuder/gitlab.yml
 # global settings
