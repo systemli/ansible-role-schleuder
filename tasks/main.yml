@@ -1,5 +1,13 @@
 ---
 
+- name: install apt dependencies
+  apt:
+    name: "{{ __apt_dependencies }}"
+    state: 'present'
+  vars:
+    __apt_dependencies:
+      - python-apt
+
 - include: schleuder.yml
   tags:
     - schleuder
@@ -9,11 +17,6 @@
     - schleuder_cli
   when: schleuder_install_cli
 
-- include: schleuder_web.yml
-  tags:
-    - schleuder_web
-  when: schleuder_install_web
-
 - name: flush handlers to ensure api is setup correct
   meta: flush_handlers
 
@@ -22,6 +25,11 @@
     port: 4443
     delay: 10
   when: schleuder_install.changed
+
+- include: schleuder_web.yml
+  tags:
+    - schleuder_web
+  when: schleuder_install_web
 
 - include: schleuder_gitlab_ticket_plugin.yml
   tags:
