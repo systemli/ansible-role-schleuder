@@ -141,6 +141,9 @@ schleuder_web_superadmins:
 
 schleuder_web_version: debian/buster/0.0.3
 
+schleuder_schleuder_web_api_host: "{{ schleuder_api.host }}"
+schleuder_schleuder_web_api_port: "{{ schleuder_api.port }}"
+
 ### schleuder/gitlab.yml
 # global settings
 schleuder_gitlab_default_subject_filters: []

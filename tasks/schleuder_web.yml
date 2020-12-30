@@ -248,7 +248,15 @@
     state: restarted
   when: __schleuder_repo_clone.changed or schleuder_web_systemd.changed
 
+- name: register status of schleuder web
+  command: systemctl status -l schleuder-web
+  register: schleuder_web_systemd_output
+  changed_when: False
+
+- name: debug status of schleuder web
+  debug:
+    msg: "{{ schleuder_web_systemd_output.stdout_lines }}"
+
 - name: ensure schleuder-web is up and running
-  command: "systemctl is-active schleuder-web"
-  become: true
+  command: systemctl is-active --quiet schleuder-web
   changed_when: false
