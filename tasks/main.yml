@@ -6,7 +6,7 @@
     state: 'present'
   vars:
     __apt_dependencies:
-      - python-apt
+      - python3-apt
 
 - include: schleuder.yml
   tags:
