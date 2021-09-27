@@ -24,4 +24,4 @@ provisioner:
 
 verifier:
   name: goss
-  enabled: false
+  enabled: yes
