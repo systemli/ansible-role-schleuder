@@ -121,8 +121,8 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed
 
-- name: Set bundle config option to install without develop (repo changed)
-  command: "/usr/local/bin/bundle config set --local without development"
+- name: Set bundle config option to install without develop and test (repo changed)
+  command: "/usr/local/bin/bundle config set --local without 'development test'"
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
