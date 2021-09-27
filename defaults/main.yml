@@ -70,7 +70,7 @@ schleuder_database:
     pool: 5
     timeout: 5000
 schleuder_api:
-  host: localhost
+  host: 127.0.0.1
   port: 4443
   # Certificate and key to use. You can create new ones with `schleuder cert generate`.
   tls_cert_file: "/etc/schleuder/schleuder-certificate.pem"
@@ -139,7 +139,7 @@ schleuder_web_mailer_from: noreply@example.org
 schleuder_web_superadmins:
   - "{{ schleuder_superadmin }}"
 
-schleuder_web_version: debian/buster/0.0.3
+schleuder_web_version: "{{ 'debian/buster/3.4.0' if ansible_distribution_release == 'buster' else 'debian/bullseye/3.6.0' }}"
 
 schleuder_schleuder_web_api_host: "{{ schleuder_api.host }}"
 schleuder_schleuder_web_api_port: "{{ schleuder_api.port }}"

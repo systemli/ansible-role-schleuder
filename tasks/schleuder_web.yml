@@ -1,5 +1,15 @@
 ---
 
+- name: install schleuder-web build dependencies on buster
+  apt:
+    name: "{{ __schleuder_web_build_dependencies }}"
+    state: 'present'
+  vars:
+    __schleuder_web_build_dependencies:
+      - zlibc
+  when:
+    - ansible_distribution_release == "buster"
+
 - name: install schleuder-web build dependencies
   apt:
     name: "{{ __schleuder_web_build_dependencies }}"
@@ -7,7 +17,6 @@
   vars:
     __schleuder_web_build_dependencies:
       - sqlite3
-      - zlibc
       - zlib1g
       - libxml2
       - libxml2-dev
@@ -112,8 +121,30 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed
 
+- name: Set bundle config option to install without develop (repo changed)
+  command: "/usr/local/bin/bundle config set --local without development"
+  check_mode: no
+  args:
+    chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
+  become_user: "{{ schleuder_schleuder_web_user }}"
+  vars:
+    ansible_ssh_pipelining: True
+  when: __schleuder_repo_clone.changed
+
+- name: Set bundle config option for path (when repo changed)
+  command: "/usr/local/bin/bundle config set --local path {{ schleuder_schleuder_web_home }}/.gem"
+  check_mode: no
+  args:
+    chdir: "{{ schleuder_schleuder_web_path }}"
+  become: true
+  become_user: "{{ schleuder_schleuder_web_user }}"
+  vars:
+    ansible_ssh_pipelining: True
+  when: __schleuder_repo_clone.changed
+
 - name: install bundle (when repo changed)
-  command: "/usr/local/bin/bundle install --without development --path {{ schleuder_schleuder_web_home }}/.gem"
+  command: "/usr/local/bin/bundle install"
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
@@ -129,7 +160,7 @@
   register: stat_schleuder_web_systemd_file
 
 - name: generate schleuder-web's rake secret
-  command: rake secret
+  command: "/usr/local/bin/bundle exec rake secret"
   changed_when: False
   check_mode: no
   become: true
@@ -169,7 +200,7 @@
   register: __schleuder_schleuder_web_database
 
 - name: prepare schleuder-web database environment (when repo changed)
-  command: "bundle exec rails db:environment:set RAILS_ENV=production"
+  command: "/usr/local/bin/bundle exec rails db:environment:set RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -181,7 +212,7 @@
   when: __schleuder_repo_clone.changed
 
 - name: setup schleuder-web database (when repo changed)
-  command: "bundle exec rake db:setup RAILS_ENV=production"
+  command: "/usr/local/bin/bundle exec rake db:setup RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -193,7 +224,7 @@
   when: __schleuder_repo_clone.changed and not __schleuder_schleuder_web_database.stat.exists
 
 - name: migrate schleuder-web database (when repo changed)
-  command: "bundle exec rake db:migrate RAILS_ENV=production"
+  command: "/usr/local/bin/bundle exec rake db:migrate RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -212,7 +243,7 @@
     mode: 0600
 
 - name: precompile schleuder-web assets (when repo changed)
-  command: "bundle exec rake assets:precompile RAILS_ENV=production"
+  command: "/usr/local/bin/bundle exec rake assets:precompile RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -238,6 +269,7 @@
     dest: "{{ schleuder_schleuder_web_systemd_path }}"
     owner: root
     group: root
+    mode: 0644
   register: schleuder_web_systemd
 
 - name: ensure schleuder-web systemd service is restarted and enabled
