@@ -144,7 +144,7 @@
   when: __schleuder_repo_clone.changed
 
 - name: install bundle (when repo changed)
-  command: "/usr/local/bin/bundle install"
+  command: "/usr/local/bin/bundle install --jobs {{ ansible_processor_cores }}"
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
