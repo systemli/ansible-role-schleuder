@@ -7,6 +7,8 @@
   vars:
     __apt_dependencies:
       - python-apt
+  when:
+    - ansible_distribution_release == "buster"
 
 - include: schleuder.yml
   tags:
