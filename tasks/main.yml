@@ -6,7 +6,7 @@
     state: 'present'
   vars:
     __apt_dependencies:
-      - python-apt
+      - python{{'3' if ansible_python.version.major == 3 else ''}}-apt
   when:
     - ansible_distribution_release == "buster"
 
