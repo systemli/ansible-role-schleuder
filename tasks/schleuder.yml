@@ -7,7 +7,6 @@
   vars:
     __schleuder_dependencies:
       - sqlite3
-      - haveged
 
 - name: install tor
   apt:
