@@ -5,7 +5,7 @@ galaxy_info:
   description: Role to setup and maintain schleuder software and it's lists
   company: systemli.org
   license: GPLv3
-  min_ansible_version: 2.2
+  min_ansible_version: "2.2"
   galaxy_tags:
     - mail
     - gpg
@@ -17,5 +17,3 @@ galaxy_info:
       versions:
         - bullseye
         - buster
-  notifications:
-    webhooks: https://galaxy.ansible.com/api/v1/notifications/
