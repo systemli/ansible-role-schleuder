@@ -1,5 +1,4 @@
 ---
-
 - name: install schleuder-gitlab-plugin-gem dependencies
   apt:
     pkg:
@@ -11,6 +10,7 @@
     path: "{{ schleuder_gitlab_plugin_path }}"
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
+    mode: 0755
     state: directory
 
 - name: ensure schleuder-gitlab-plugin is latest
@@ -18,6 +18,7 @@
     repo: "{{ schleuder_gitlab_plugin_repo }}"
     dest: "{{ schleuder_gitlab_plugin_path }}"
     update: "{{ schleuder_gitlab_plugin_git_update }}"
+    version: "{{ schleuder_gitlab_plugin_git_version }}"
   become: true
   become_user: "{{ schleuder_schleuder_user }}"
   register: __schleuder_gitlab_plugin_repo_clone
@@ -45,9 +46,10 @@
 - name: ensure schleuder filter path is present
   file:
     path: /usr/local/lib/schleuder/filters/post_decryption
-    state: directory
     owner: root
     group: staff
+    mode: 0755
+    state: directory
 
 - name: link gitlab-ticketing plugin as schleuder post_decryption filter
   file:
