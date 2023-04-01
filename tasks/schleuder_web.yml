@@ -115,7 +115,7 @@
     - schleuder-web.yml
 
 - name: install bundler (when repo changed)
-  command: "gem install bundler"
+  command: "gem install bundler -v 2.3.26"
   check_mode: no
   vars:
     ansible_ssh_pipelining: True
