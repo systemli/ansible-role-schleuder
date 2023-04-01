@@ -2,7 +2,7 @@
 
 # a small wrapper to manage init member keys and a schleuder_list
 
-- name: "{{ list.name }} | register existing schleuder lists"
+- name: "Register existing schleuder lists | {{ list.name }}"
   command: "schleuder-cli lists list"
   args:
     chdir: /root
@@ -12,7 +12,7 @@
   tags:
     - schleuder_lists
 
-- name: "{{ list.name }} | ensure public key of admin is present"
+- name: "Ensure public key of admin is present | {{ list.name }}"
   copy:
     src: "schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
     dest: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
@@ -27,7 +27,7 @@
     - schleuder_lists
 
 # create list without admin public key, if is not present
-- name: "{{ list.name }} | ensure schleuder list is present"
+- name: "Ensure schleuder list is present | {{ list.name }}"
   command: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
   args:
     chdir: /root
@@ -40,7 +40,7 @@
     - schleuder_lists
 
 # create list with admin public key, if it is present
-- name: "{{ list.name }} | ensure schleuder list is present"
+- name: "Ensure schleuder list is present | {{ list.name }}"
   command: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
   args:
     chdir: /root
@@ -52,7 +52,7 @@
   tags:
     - schleuder_lists
 
-- name: "{{ list.name }} | ensure dirmngr.conf is present"
+- name: "Ensure dirmngr.conf is present | {{ list.name }}"
   template:
     src: schleuder/dirmngr.conf.j2
     dest: "/var/lib/schleuder/lists/{{  list.name.split('@')[1] }}/{{  list.name.split('@')[0] }}/dirmngr.conf"
@@ -63,7 +63,7 @@
   tags:
     - schleuder_lists
 
-- name: "{{ list.name }} | ensure schleuder list is absent"
+- name: "Ensure schleuder list is absent | {{ list.name }}"
   command: "schleuder-cli lists delete {{ list.name }} --YES"
   args:
     chdir: /root
@@ -73,7 +73,7 @@
   tags:
     - schleuder_lists
 
-- name: "{{ list.name }} | ensure public-key of admin is absent"
+- name: "Ensure public-key of admin is absent | {{ list.name }}"
   file:
     path: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
     state: absent
@@ -83,7 +83,7 @@
   tags:
     - schleuder_lists
 
-- name: "{{ list.name }} | send list-key to subscription (admin)"
+- name: "Send list-key to subscription (admin) | {{ list.name }}"
   command: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
   args:
     chdir: /root

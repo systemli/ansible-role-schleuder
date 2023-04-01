@@ -1,6 +1,6 @@
 ---
 
-- name: install apt dependencies
+- name: Install apt dependencies
   apt:
     name: "{{ __apt_dependencies }}"
     state: 'present'
@@ -10,42 +10,48 @@
   when:
     - ansible_distribution_release == "buster"
 
-- include: schleuder.yml
+- name: Import schleuder tasks
+  import_tasks: schleuder.yml
   tags:
     - schleuder
 
-- include: schleuder_cli.yml
+- name: Import schleuder-cli tasks
+  import_tasks: schleuder_cli.yml
   tags:
     - schleuder_cli
   when: schleuder_install_cli
 
-- name: flush handlers to ensure api is setup correct
+- name: Flush handlers to ensure api is setup correct
   meta: flush_handlers
 
-- name: wait until api is restarted on fresh install
+- name: Wait until api is restarted on fresh install
   wait_for:
     port: 4443
     delay: 10
   when: schleuder_install.changed
 
-- include: schleuder_web.yml
+- name: Import schleuder web tasks
+  import_tasks: schleuder_web.yml
   tags:
     - schleuder_web
   when: schleuder_install_web
 
-- include: schleuder_gitlab_ticket_plugin.yml
+- name: Import tasks for schleuder Gitlab plugin
+  import_tasks: schleuder_gitlab_ticket_plugin.yml
   tags:
     - schleuder_gitlab_ticket_plugin
   when: schleuder_install_gitlab_ticket_plugin
 
-- include_tasks: schleuder_lists.yml
+- name: Include schleuder list tasks per list
+  include_tasks: schleuder_lists.yml
   with_items: "{{ schleuder_lists }}"
   loop_control:
     loop_var: list
   tags:
     - schleuder_lists
 
-- include: goss.yml
+- name: Import goss tasks
+  import_tasks: goss.yml
   tags:
     - schleuder
     - goss
