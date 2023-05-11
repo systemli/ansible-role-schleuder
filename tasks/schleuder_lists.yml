@@ -1,24 +1,23 @@
 ---
-
 # a small wrapper to manage init member keys and a schleuder_list
 
 - name: "Register existing schleuder lists | {{ list.name }}"
-  command: "schleuder-cli lists list"
+  ansible.builtin.command: "schleuder-cli lists list"
   args:
     chdir: /root
-  check_mode: no
+  check_mode: false
   register: existing_schleuder_lists
   changed_when: False
   tags:
     - schleuder_lists
 
 - name: "Ensure public key of admin is present | {{ list.name }}"
-  copy:
+  ansible.builtin.copy:
     src: "schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
     dest: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
     owner: root
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0640
+    mode: "0640"
   when:
     - list.admin_pubkey_present|default(True)
     - list.name not in existing_schleuder_lists.stdout
@@ -28,7 +27,8 @@
 
 # create list without admin public key, if is not present
 - name: "Ensure schleuder list is present | {{ list.name }}"
-  command: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
+  ansible.builtin.command: "schleuder-cli lists new {{ list.name }} {{ list.admin }}"
+  changed_when: false
   args:
     chdir: /root
   when:
@@ -41,7 +41,8 @@
 
 # create list with admin public key, if it is present
 - name: "Ensure schleuder list is present | {{ list.name }}"
-  command: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+  ansible.builtin.command: "schleuder-cli lists new {{ list.name }} {{ list.admin }} /var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
+  changed_when: false
   args:
     chdir: /root
   when:
@@ -53,18 +54,19 @@
     - schleuder_lists
 
 - name: "Ensure dirmngr.conf is present | {{ list.name }}"
-  template:
+  ansible.builtin.template:
     src: schleuder/dirmngr.conf.j2
     dest: "/var/lib/schleuder/lists/{{  list.name.split('@')[1] }}/{{  list.name.split('@')[0] }}/dirmngr.conf"
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0600
+    mode: "0600"
   when: schleuder_gpg_use_tor
   tags:
     - schleuder_lists
 
 - name: "Ensure schleuder list is absent | {{ list.name }}"
-  command: "schleuder-cli lists delete {{ list.name }} --YES"
+  ansible.builtin.command: "schleuder-cli lists delete {{ list.name }} --YES"
+  changed_when: false
   args:
     chdir: /root
   when:
@@ -74,7 +76,7 @@
     - schleuder_lists
 
 - name: "Ensure public-key of admin is absent | {{ list.name }}"
-  file:
+  ansible.builtin.file:
     path: "/var/lib/schleuder/adminkeys/{{ list.name }}_{{ list.admin }}.pub"
     state: absent
   when:
@@ -84,11 +86,12 @@
     - schleuder_lists
 
 - name: "Send list-key to subscription (admin) | {{ list.name }}"
-  command: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
+  ansible.builtin.command: "schleuder-cli lists send-list-key-to-subscriptions {{ list.name }}"
+  changed_when: false
   args:
     chdir: /root
   when:
-    - __list_creation.changed
+    - __list_creation.changed # noqa: no-handler
     - list.admin_pubkey_present|default(True)
     - list.send_list_key|default(True)
     - not schleuder_vagrant_testenvironment|default(False)

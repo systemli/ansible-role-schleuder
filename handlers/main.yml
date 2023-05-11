@@ -1,6 +1,11 @@
 ---
-
-- name: restart schleuder-api-daemon
-  service:
+- name: Restart schleuder-api-daemon
+  ansible.builtin.systemd:
     name: schleuder-api-daemon
     state: restarted
+
+- name: Restart schleuder-web
+  ansible.builtin.systemd:
+    name: schleuder-web
+    state: restarted
+    daemon_reload: true

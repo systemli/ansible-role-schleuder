@@ -1,44 +1,41 @@
 ---
-
-- name: install schleuder-web build dependencies on buster
-  apt:
-    name: "{{ __schleuder_web_build_dependencies }}"
-    state: 'present'
-  vars:
-    __schleuder_web_build_dependencies:
-      - zlibc
+- name: Install schleuder-web build dependencies on buster
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "present"
+  loop:
+    - zlibc
   when:
     - ansible_distribution_release == "buster"
 
-- name: install schleuder-web build dependencies
-  apt:
-    name: "{{ __schleuder_web_build_dependencies }}"
-    state: 'present'
-  vars:
-    __schleuder_web_build_dependencies:
-      - sqlite3
-      - zlib1g
-      - libxml2
-      - libxml2-dev
-      - zlib1g-dev
-      - ruby
-      - ruby-dev
-      - git
-      - gcc
-      - g++
-      - make
-      - libsqlite3-dev
+- name: Install schleuder-web build dependencies
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "present"
+  loop:
+    - sqlite3
+    - zlib1g
+    - libxml2
+    - libxml2-dev
+    - zlib1g-dev
+    - ruby
+    - ruby-dev
+    - git
+    - gcc
+    - g++
+    - make
+    - libsqlite3-dev
 
-- name: ensure /var/www is present
-  file:
+- name: Ensure /var/www is present
+  ansible.builtin.file:
     path: /var/www
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
-- name: ensure schleuder-web user exists
-  user:
+- name: Ensure schleuder-web user exists
+  ansible.builtin.user:
     name: "{{ schleuder_schleuder_web_user }}"
     home: "{{ schleuder_schleuder_web_home }}"
     shell: /bin/false
@@ -47,29 +44,29 @@
 # which allows to specify a list of trusted GPG key fingerprints to compare to
 # the GPG key fingerprint which signed the git tag.
 
-- name: ensure schleuder-web gnupg home exists
-  file:
+- name: Ensure schleuder-web gnupg home exists
+  ansible.builtin.file:
     path: "{{ schleuder_schleuder_web_home }}/.gnupg"
     state: directory
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0700
+    mode: "0700"
 
-- name: ensure schleuder-web upstream gpg signing key is present
-  copy:
+- name: Ensure schleuder-web upstream gpg signing key is present
+  ansible.builtin.copy:
     src: var/www/schleuder-web/.gnupg/pubring.gpg
     dest: "{{ schleuder_schleuder_web_home }}/.gnupg/pubring.gpg"
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0600
+    mode: "0600"
 
-- name: check if schleuder-web dir exists
-  stat:
+- name: Check if schleuder-web dir exists
+  ansible.builtin.stat:
     path: "{{ schleuder_schleuder_web_path }}"
   register: __schleuder_schleuder_web_path
 
-- name: ensure schleuder-web local checkout is pristine
-  command: git reset --hard HEAD --quiet
+- name: Ensure schleuder-web local checkout is pristine # noqa: command-instead-of-module
+  ansible.builtin.command: git reset --hard HEAD --quiet
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   changed_when: false
@@ -77,8 +74,8 @@
     - __schleuder_schleuder_web_path.stat.exists
     - not __testing | default(False)
 
-- name: ensure schleuder-web checkout of specified version
-  git:
+- name: Ensure schleuder-web checkout of specified version
+  ansible.builtin.git:
     repo: "{{ schleuder_schleuder_web_repo }}"
     dest: "{{ schleuder_schleuder_web_path }}"
     update: "{{ schleuder_schleuder_web_git_update }}"
@@ -91,38 +88,40 @@
     ansible_ssh_pipelining: True
   register: __schleuder_repo_clone
 
-- name: ensure schleuder-web web config is latest
-  template:
+- name: Ensure schleuder-web web config is latest
+  ansible.builtin.template:
     src: schleuder-web/schleuder-web.yml.j2
     dest: "{{ schleuder_schleuder_web_path }}/config/schleuder-web.yml"
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0640
+    mode: "0640"
 
-- name: ensure schleuder-web database config is latest
-  template:
+- name: Ensure schleuder-web database config is latest
+  ansible.builtin.template:
     src: schleuder-web/database.yml.j2
     dest: "{{ schleuder_schleuder_web_path }}/config/database.yml"
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0640
+    mode: "0640"
 
-- name: ensure populated schleuder-web configs are backed up when running in testing
-  command: "cp --preserve=all {{ schleuder_schleuder_web_path }}/config/{{ item }} {{ schleuder_schleuder_web_home }}/config"
+- name: Ensure populated schleuder-web configs are backed up when running in testing
+  ansible.builtin.command: "cp --preserve=all {{ schleuder_schleuder_web_path }}/config/{{ item }} {{ schleuder_schleuder_web_home }}/config"
   changed_when: false
   with_items:
     - database.yml
     - schleuder-web.yml
 
-- name: install bundler (when repo changed)
-  command: "gem install bundler -v 2.3.26"
+- name: Install bundler (when repo changed)
+  ansible.builtin.command: "gem install bundler -v 2.3.26"
+  changed_when: false
   check_mode: no
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Set bundle config option to install without develop and test (repo changed)
-  command: "/usr/local/bin/bundle config set --local without 'development test'"
+  ansible.builtin.command: "/usr/local/bin/bundle config set --local without 'development test'"
+  changed_when: false
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
@@ -130,10 +129,11 @@
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Set bundle config option for path (when repo changed)
-  command: "/usr/local/bin/bundle config set --local path {{ schleuder_schleuder_web_home }}/.gem"
+  ansible.builtin.command: "/usr/local/bin/bundle config set --local path {{ schleuder_schleuder_web_home }}/.gem"
+  changed_when: false
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
@@ -141,10 +141,11 @@
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed # noqa: no-handler
 
-- name: install bundle (when repo changed)
-  command: "/usr/local/bin/bundle install --jobs {{ ansible_processor_cores }}"
+- name: Install bundle (when repo changed)
+  ansible.builtin.command: "/usr/local/bin/bundle install --jobs {{ ansible_processor_cores }}"
+  changed_when: false
   check_mode: no
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
@@ -152,15 +153,15 @@
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed # noqa: no-handler
 
-- name: check if schleuder-web systemd unit already exists
-  stat:
+- name: Check if schleuder-web systemd unit already exists
+  ansible.builtin.stat:
     path: "{{ schleuder_schleuder_web_systemd_path }}"
   register: stat_schleuder_web_systemd_file
 
-- name: generate schleuder-web's rake secret
-  command: "/usr/local/bin/bundle exec rake secret"
+- name: Generate schleuder-web's rake secret
+  ansible.builtin.command: "/usr/local/bin/bundle exec rake secret"
   changed_when: False
   check_mode: no
   become: true
@@ -172,35 +173,36 @@
     chdir: "{{ schleuder_schleuder_web_path }}"
   when: not stat_schleuder_web_systemd_file.stat.exists
 
-- name: register existing schleuder-web secret_key_base
-  shell: "executable=/bin/bash set -o pipefail && grep SECRET_KEY_BASE {{ schleuder_schleuder_web_environment_vars_path }} | cut -d'=' -f2"
+- name: Register existing schleuder-web secret_key_base # noqa: no-free-form
+  ansible.builtin.shell: "executable=/bin/bash set -o pipefail && grep SECRET_KEY_BASE {{ schleuder_schleuder_web_environment_vars_path }} | cut -d'=' -f2"
   register: schleuder_web_existing_secret_key_base_tmp
   check_mode: no
   changed_when: False
-  when: stat_schleuder_web_systemd_file.stat.exists
+  when: stat_schleuder_web_systemd_file.stat.exists # noqa: no-handler
 
-- name: sanitize schleuder_web_existing_secret_key_base_tmp
-  set_fact:
+- name: Sanitize schleuder_web_existing_secret_key_base_tmp
+  ansible.builtin.set_fact:
     schleuder_web_existing_secret_key_base: "{{ schleuder_web_existing_secret_key_base_tmp.stdout.split(' ')[-1] }}"
   when: stat_schleuder_web_systemd_file.stat.exists
 
-- name: convert schleuder-web's rake secret to fact (new secret)
-  set_fact:
+- name: Convert schleuder-web's rake secret to fact (new secret)
+  ansible.builtin.set_fact:
     schleuder_schleuder_web_secret_key_base: "{{ __rake_secret.stdout }}"
   when: not stat_schleuder_web_systemd_file.stat.exists
 
-- name: convert schleuder-web's rake secret to fact (existing secret)
-  set_fact:
+- name: Convert schleuder-web's rake secret to fact (existing secret)
+  ansible.builtin.set_fact:
     schleuder_schleuder_web_secret_key_base: "{{ schleuder_web_existing_secret_key_base }}"
   when: stat_schleuder_web_systemd_file.stat.exists
 
-- name: check if the database was already set up
-  stat:
+- name: Check if the database was already set up
+  ansible.builtin.stat:
     path: "{{ schleuder_schleuder_web_path }}/{{ schleuder_web_database.production.database }}"
   register: __schleuder_schleuder_web_database
 
-- name: prepare schleuder-web database environment (when repo changed)
-  command: "/usr/local/bin/bundle exec rails db:environment:set RAILS_ENV=production"
+- name: Prepare schleuder-web database environment (when repo changed)
+  ansible.builtin.command: "/usr/local/bin/bundle exec rails db:environment:set RAILS_ENV=production"
+  changed_when: false
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -209,10 +211,11 @@
     SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed
+  when: __schleuder_repo_clone.changed # noqa: no-handler
 
-- name: setup schleuder-web database (when repo changed)
-  command: "/usr/local/bin/bundle exec rake db:setup RAILS_ENV=production"
+- name: Setup schleuder-web database (when repo changed)
+  ansible.builtin.command: "/usr/local/bin/bundle exec rake db:setup RAILS_ENV=production"
+  changed_when: false
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -223,8 +226,9 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed and not __schleuder_schleuder_web_database.stat.exists
 
-- name: migrate schleuder-web database (when repo changed)
-  command: "/usr/local/bin/bundle exec rake db:migrate RAILS_ENV=production"
+- name: Migrate schleuder-web database (when repo changed)
+  ansible.builtin.command: "/usr/local/bin/bundle exec rake db:migrate RAILS_ENV=production"
+  changed_when: false
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -235,15 +239,15 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed and __schleuder_schleuder_web_database.stat.exists
 
-- name: ensure schleuder-web database permissions
-  file:
+- name: Ensure schleuder-web database permissions
+  ansible.builtin.file:
     path: "{{ schleuder_schleuder_web_path }}/db/production.sqlite"
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0600
+    mode: "0600"
 
-- name: precompile schleuder-web assets (when repo changed)
-  command: "/usr/local/bin/bundle exec rake assets:precompile RAILS_ENV=production"
+- name: Precompile schleuder-web assets (when repo changed)
+  ansible.builtin.command: "/usr/local/bin/bundle exec rake assets:precompile RAILS_ENV=production"
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
@@ -254,32 +258,26 @@
   vars:
     ansible_ssh_pipelining: True
 
-- name: ensure schleuder-web environment file is latest
-  template:
+- name: Ensure schleuder-web environment file is latest
+  ansible.builtin.template:
     src: schleuder-web/default/schleuder-web.j2
     dest: "{{ schleuder_schleuder_web_environment_vars_path }}"
     owner: "{{ schleuder_schleuder_web_user }}"
     group: "{{ schleuder_schleuder_web_user }}"
-    mode: 0600
-  register: schleuder_web_systemd
+    mode: "0600"
+  notify: Restart schleuder-web
 
-- name: ensure schleuder-web systemd unit file is latest
-  template:
+- name: Ensure schleuder-web systemd unit file is latest
+  ansible.builtin.template:
     src: schleuder-web/systemd/system/schleuder-web.service.j2
     dest: "{{ schleuder_schleuder_web_systemd_path }}"
     owner: root
     group: root
-    mode: 0644
-  register: schleuder_web_systemd
+    mode: "0644"
+  notify: Restart schleuder-web
 
-- name: ensure schleuder-web systemd service is restarted and enabled
-  systemd:
-    daemon_reload: yes
+- name: Start schleuder-web
+  ansible.builtin.systemd:
     name: schleuder-web
     enabled: yes
-    state: restarted
-  when: __schleuder_repo_clone.changed or schleuder_web_systemd.changed
-
-- name: ensure schleuder-web is up and running
-  command: systemctl is-active --quiet schleuder-web
-  changed_when: false
+    state: started

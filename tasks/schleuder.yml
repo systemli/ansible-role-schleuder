@@ -1,125 +1,125 @@
 ---
-
-- name: install schleuder dependencies
-  apt:
+- name: Install schleuder dependencies
+  ansible.builtin.apt:
     name: "{{ __schleuder_dependencies }}"
-    state: 'present'
+    state: "present"
   vars:
     __schleuder_dependencies:
       - sqlite3
 
-- name: install tor
-  apt:
+- name: Install tor
+  ansible.builtin.apt:
     name: tor
-    state: 'present'
+    state: "present"
   when: schleuder_gpg_use_tor
 
-- name: install schleuder
-  apt:
+- name: Install schleuder
+  ansible.builtin.apt:
     name: "{{ __schleuder_packages }}"
-    state: 'present'
+    state: "present"
   vars:
     __schleuder_packages:
       - schleuder
   register: schleuder_install
 
-- name: register schleuder tls fingerprint
+- name: Register schleuder tls fingerprint
   become: true
   become_user: "{{ schleuder_schleuder_user }}"
-  command: /usr/bin/schleuder cert fingerprint
+  ansible.builtin.command: /usr/bin/schleuder cert fingerprint
   register: schleuder_tls_fingerprint_tmp
   changed_when: False
   check_mode: no
   vars:
     ansible_ssh_pipelining: True
 
-- name: sanitize schleuder_tls_fingerprint_tmp
-  set_fact:
+- name: Sanitize schleuder_tls_fingerprint_tmp
+  ansible.builtin.set_fact:
     schleuder_tls_fingerprint: "{{ schleuder_tls_fingerprint_tmp.stdout.split(' ')[-1] }}"
 
-- name: generate new schleuder api key (when it does already exists)
+- name: Generate new schleuder api key (when it does already exists)
+  ansible.builtin.command: /usr/bin/schleuder new_api_key
+  changed_when: false
+  check_mode: no
   become: true
   become_user: "{{ schleuder_schleuder_user }}"
-  command: /usr/bin/schleuder new_api_key
   register: schleuder_cli_install_api_key
-  check_mode: no
-  when: schleuder_install.changed
+  when: schleuder_install.changed # noqa: no-handler
   vars:
     ansible_ssh_pipelining: True
 
-- name: set schleuder_api_key to registered key, if schleuder is installed
-  set_fact:
+- name: Set schleuder_api_key to registered key, if schleuder is installed
+  ansible.builtin.set_fact:
     schleuder_cli_api_key: "{{ schleuder_cli_install_api_key.stdout }}"
-  when: schleuder_install.changed
+  when: schleuder_install.changed # noqa: no-handler
 
 # check if API Key already exists
-- name: check if schleuder-cli.yml already exists
-  stat:
+- name: Check if schleuder-cli.yml already exists
+  ansible.builtin.stat:
     path: "{{ schleuder_cli_path }}/schleuder-cli.yml"
   register: stat_schleuder_cli_path
 
-- name: register existing schleuder api key
-  shell: "executable=/bin/bash set -o pipefail && grep api_key {{ schleuder_cli_path }}/schleuder-cli.yml | cut -d' ' -f2"
+- name: Register existing schleuder api key # noqa: no-free-form
+  ansible.builtin.shell: "executable=/bin/bash set -o pipefail && grep api_key {{ schleuder_cli_path }}/schleuder-cli.yml | cut -d' ' -f2"
   register: schleuder_cli_existing_api_key
   check_mode: no
   changed_when: False
   when: stat_schleuder_cli_path.stat.exists and not schleuder_install.changed
 
-- name: set schleuder_api_key, if schleuder is already installed
-  set_fact:
+- name: Set schleuder_api_key, if schleuder is already installed
+  ansible.builtin.set_fact:
     schleuder_cli_api_key: "{{ schleuder_cli_existing_api_key.stdout }}"
   when: stat_schleuder_cli_path.stat.exists and not schleuder_install.changed
 
-- name: ensure schleuder.yml is latest
-  template:
+- name: Ensure schleuder.yml is latest
+  ansible.builtin.template:
     src: schleuder/schleuder.yml.j2
-    dest: '/etc/schleuder/schleuder.yml'
+    dest: "/etc/schleuder/schleuder.yml"
     owner: "root"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0640
-  notify: restart schleuder-api-daemon
+    mode: "0640"
+  notify: Restart schleuder-api-daemon
 
-- name: ensure list-defaults.yml is latest
-  template:
+- name: Ensure list-defaults.yml is latest
+  ansible.builtin.template:
     src: schleuder/list-defaults.yml.j2
     dest: "/etc/schleuder/list-defaults.yml"
     owner: "root"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0640
+    mode: "0640"
 
-- name: check if schleuder api is reachable
-  uri:
+- name: Check if schleuder api is reachable
+  ansible.builtin.uri:
     url: "https://{{ schleuder_api.host }}:{{ schleuder_api.port }}/status.json"
     validate_certs: False
     method: GET
     status_code: 200
     body_format: json
   when:
-    - schleuder_install.changed
+    - schleuder_install.changed # noqa: no-handler
     - not __testing | default(False)
 
-- name: ensure /var/lib/schleuder/adminkeys is present
-  file:
+- name: Ensure /var/lib/schleuder/adminkeys is present
+  ansible.builtin.file:
     path: "{{ schleuder_admin_keys_path }}"
     state: directory
     owner: "root"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0640
+    mode: "0640"
 
-- name: ensure /var/lib/schleuder/.gnupg is present
-  file:
+- name: Ensure /var/lib/schleuder/.gnupg is present
+  ansible.builtin.file:
     path: "/var/lib/schleuder/.gnupg"
     state: directory
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0700
+    mode: "0700"
   when: schleuder_gpg_use_tor
 
-- name: ensure dirmngr.conf is latest
-  template:
+- name: Ensure dirmngr.conf is latest
+  ansible.builtin.template:
     src: schleuder/dirmngr.conf.j2
-    dest: '/var/lib/schleuder/.gnupg/dirmngr.conf'
+    dest: "/var/lib/schleuder/.gnupg/dirmngr.conf"
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0600
+    mode: "0600"
   when: schleuder_gpg_use_tor
