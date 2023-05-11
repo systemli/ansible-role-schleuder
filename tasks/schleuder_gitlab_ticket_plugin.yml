@@ -1,20 +1,22 @@
 ---
-- name: install schleuder-gitlab-plugin-gem dependencies
-  apt:
-    pkg:
-      - ruby-gitlab
-      - ruby-httparty
+- name: Install schleuder-gitlab-plugin-gem dependencies
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "present"
+  loop:
+    - ruby-gitlab
+    - ruby-httparty
 
-- name: ensure schleuder-gitlab-plugin path present
-  file:
+- name: Ensure schleuder-gitlab-plugin path present
+  ansible.builtin.file:
     path: "{{ schleuder_gitlab_plugin_path }}"
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0755
+    mode: "0755"
     state: directory
 
-- name: ensure schleuder-gitlab-plugin is latest
-  git:
+- name: Ensure schleuder-gitlab-plugin is latest
+  ansible.builtin.git:
     repo: "{{ schleuder_gitlab_plugin_repo }}"
     dest: "{{ schleuder_gitlab_plugin_path }}"
     update: "{{ schleuder_gitlab_plugin_git_update }}"
@@ -25,42 +27,43 @@
   vars:
     ansible_ssh_pipelining: True
 
-- name: generate schleuder-gitlab-plugin gemfile from gemspecs
-  command: gem build schleuder-gitlab-ticketing.gemspec
+- name: Generate schleuder-gitlab-plugin gemfile from gemspecs
+  ansible.builtin.command: gem build schleuder-gitlab-ticketing.gemspec
   args:
     chdir: "{{ schleuder_gitlab_plugin_path }}"
     creates: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-1.0.0.gem"
   become: true
   become_user: "{{ schleuder_schleuder_user }}"
-  when: __schleuder_gitlab_plugin_repo_clone.changed
+  changed_when: false
+  when: __schleuder_gitlab_plugin_repo_clone.changed # noqa: no-handler
   vars:
     ansible_ssh_pipelining: True
 
-- name: ensure schleuder-gitlab-plugin-gem is installed from local gem (until gem is released)
-  gem:
+- name: Ensure schleuder-gitlab-plugin-gem is installed from local gem (until gem is released)
+  community.general.gem:
     name: schleuder-gitlab-ticketing
     gem_source: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-1.0.0.gem"
     user_install: False
     state: present
 
-- name: ensure schleuder filter path is present
-  file:
+- name: Ensure schleuder filter path is present
+  ansible.builtin.file:
     path: /usr/local/lib/schleuder/filters/post_decryption
     owner: root
     group: staff
-    mode: 0755
+    mode: "0755"
     state: directory
 
-- name: link gitlab-ticketing plugin as schleuder post_decryption filter
-  file:
+- name: Link gitlab-ticketing plugin as schleuder post_decryption filter
+  ansible.builtin.file:
     src: "/var/lib/gems/{% if ansible_distribution_release == 'buster' %}2.5.0{% else %}2.7.0{% endif %}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
     dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
     state: link
 
-- name: ensure gitlab plugin config is latest
-  template:
+- name: Ensure gitlab plugin config is latest
+  ansible.builtin.template:
     src: schleuder/gitlab.yml.j2
     dest: /etc/schleuder/gitlab.yml
     owner: root
     group: "{{ schleuder_schleuder_user }}"
-    mode: 0640
+    mode: "0640"

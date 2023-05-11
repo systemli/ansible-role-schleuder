@@ -1,49 +1,47 @@
 ---
-
 - name: Install apt dependencies
-  apt:
-    name: "{{ __apt_dependencies }}"
-    state: 'present'
-  vars:
-    __apt_dependencies:
-      - python{{'3' if ansible_python.version.major == 3 else ''}}-apt
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "present"
+  loop:
+    - python{{ '3' if ansible_python.version.major == 3 else '' }}-apt
   when:
     - ansible_distribution_release == "buster"
 
 - name: Import schleuder tasks
-  import_tasks: schleuder.yml
+  ansible.builtin.import_tasks: schleuder.yml
   tags:
     - schleuder
 
 - name: Import schleuder-cli tasks
-  import_tasks: schleuder_cli.yml
+  ansible.builtin.import_tasks: schleuder_cli.yml
   tags:
     - schleuder_cli
   when: schleuder_install_cli
 
 - name: Flush handlers to ensure api is setup correct
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Wait until api is restarted on fresh install
-  wait_for:
+  ansible.builtin.wait_for:
     port: 4443
     delay: 10
-  when: schleuder_install.changed
+  when: schleuder_install.changed # noqa: no-handler
 
 - name: Import schleuder web tasks
-  import_tasks: schleuder_web.yml
+  ansible.builtin.import_tasks: schleuder_web.yml
   tags:
     - schleuder_web
   when: schleuder_install_web
 
 - name: Import tasks for schleuder Gitlab plugin
-  import_tasks: schleuder_gitlab_ticket_plugin.yml
+  ansible.builtin.import_tasks: schleuder_gitlab_ticket_plugin.yml
   tags:
     - schleuder_gitlab_ticket_plugin
   when: schleuder_install_gitlab_ticket_plugin
 
 - name: Include schleuder list tasks per list
-  include_tasks: schleuder_lists.yml
+  ansible.builtin.include_tasks: schleuder_lists.yml
   with_items: "{{ schleuder_lists }}"
   loop_control:
     loop_var: list
@@ -51,7 +49,7 @@
     - schleuder_lists
 
 - name: Import goss tasks
-  import_tasks: goss.yml
+  ansible.builtin.import_tasks: goss.yml
   tags:
     - schleuder
     - goss
