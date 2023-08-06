@@ -116,8 +116,8 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
-- name: Set bundle config option to install without develop and test (repo changed)
-  ansible.builtin.command: "/usr/local/bin/bundle config set --global without 'development test'"
+- name: Set bundle global config options
+  ansible.builtin.command: "/usr/local/bin/bundle config set --global {{ item }}"
   changed_when: false
   check_mode: no
   args:
@@ -127,18 +127,9 @@
   vars:
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed # noqa: no-handler
-
-- name: Set bundle config option for path (when repo changed)
-  ansible.builtin.command: "/usr/local/bin/bundle config set --global path {{ schleuder_schleuder_web_home }}/.gem"
-  changed_when: false
-  check_mode: no
-  args:
-    chdir: "{{ schleuder_schleuder_web_path }}"
-  become: true
-  become_user: "{{ schleuder_schleuder_web_user }}"
-  vars:
-    ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed # noqa: no-handler
+  with_items:
+    - "path {{ schleuder_schleuder_web_home }}/.gem"
+    - "without 'development test'"
 
 - name: Install bundle (when repo changed)
   ansible.builtin.command: "/usr/local/bin/bundle install"
