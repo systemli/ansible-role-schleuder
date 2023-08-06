@@ -111,7 +111,7 @@
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Set bundle config option to install without develop and test (repo changed)
-  ansible.builtin.command: "/usr/local/bin/bundle config set --local without 'development test'"
+  ansible.builtin.command: "/usr/local/bin/bundle config set --global without 'development test'"
   changed_when: false
   check_mode: no
   args:
@@ -123,7 +123,7 @@
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Set bundle config option for path (when repo changed)
-  ansible.builtin.command: "/usr/local/bin/bundle config set --local path {{ schleuder_schleuder_web_home }}/.gem"
+  ansible.builtin.command: "/usr/local/bin/bundle config set --global path {{ schleuder_schleuder_web_home }}/.gem"
   changed_when: false
   check_mode: no
   args:
