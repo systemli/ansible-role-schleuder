@@ -103,7 +103,7 @@
     - schleuder-web.yml
 
 - name: Install bundler (when repo changed)
-  ansible.builtin.command: "gem install bundler -v 2.3.26"
+  ansible.builtin.command: "gem install bundler -v 2.4.18"
   changed_when: false
   check_mode: no
   vars:
