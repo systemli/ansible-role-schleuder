@@ -17,6 +17,12 @@
     - make
     - libsqlite3-dev
 
+- name: Install schleuder-web build dependency nodejs on Debian bookworm
+  ansible.builtin.apt:
+    name: nodejs
+    state: "present"
+  when: ansible_distribution_major_version|int >= 12
+
 - name: Ensure /var/www is present
   ansible.builtin.file:
     path: /var/www
