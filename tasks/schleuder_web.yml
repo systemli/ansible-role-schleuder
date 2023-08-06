@@ -141,7 +141,7 @@
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Install bundle (when repo changed)
-  ansible.builtin.command: "/usr/local/bin/bundle install --jobs {{ ansible_processor_cores }}"
+  ansible.builtin.command: "/usr/local/bin/bundle install"
   changed_when: false
   check_mode: no
   args:
