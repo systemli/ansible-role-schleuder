@@ -1,13 +1,4 @@
 ---
-- name: Install schleuder-web build dependencies on buster
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: "present"
-  loop:
-    - zlibc
-  when:
-    - ansible_distribution_release == "buster"
-
 - name: Install schleuder-web build dependencies
   ansible.builtin.apt:
     name: "{{ item }}"

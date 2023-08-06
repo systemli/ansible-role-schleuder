@@ -56,7 +56,7 @@
 
 - name: Link gitlab-ticketing plugin as schleuder post_decryption filter
   ansible.builtin.file:
-    src: "/var/lib/gems/{% if ansible_distribution_release == 'buster' %}2.5.0{% else %}2.7.0{% endif %}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
+    src: "/var/lib/gems/{% if ansible_distribution_release == 'bullseye' %}2.7.0{% else %}3.1.0{% endif %}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
     dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
     state: link
 
