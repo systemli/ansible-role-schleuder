@@ -266,7 +266,7 @@ molecule test
 Requires Molecule, Vagrant and `python-vagrant` to be installed.For developing and testing the role we use Travis CI, Molecule and Vagrant. On the local environment you can easily test the role with
 
 
-This will spin up a virtual machine with Debian Buster. Afterwards you can connect to the Schleuder
+This will spin up a virtual machine with Debian Bookworm. Afterwards you can connect to the Schleuder
 web interface via: 
 
 ```

@@ -5,14 +5,14 @@ driver:
     name: virtualbox
 
 platforms:
-  - name: schleuder-bullseye64
-    box: debian/bullseye64
+  - name: schleuder-bookworm64
+    box: debian/bookworm64
     memory: 1024
     cpus: 2
     instance_raw_config_args:
       - "vm.network 'forwarded_port', guest: 3000, host: 3000"
-  - name: schleuder-buster64
-    box: debian/buster64
+  - name: schleuder-bullseye64
+    box: debian/bullseye64
     memory: 1024
     cpus: 2
 

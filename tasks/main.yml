@@ -1,13 +1,4 @@
 ---
-- name: Install apt dependencies
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: "present"
-  loop:
-    - python{{ '3' if ansible_python.version.major == 3 else '' }}-apt
-  when:
-    - ansible_distribution_release == "buster"
-
 - name: Import schleuder tasks
   ansible.builtin.import_tasks: schleuder.yml
   tags:
