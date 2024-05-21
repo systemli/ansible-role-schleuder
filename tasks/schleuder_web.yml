@@ -116,6 +116,13 @@
     ansible_ssh_pipelining: True
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
+- name: Ensure correct permissions
+  ansible.builtin.file:
+    group: "{{ schleuder_schleuder_web_user }}"
+    path: "{{ schleuder_schleuder_web_path }}"
+    recurse: true
+    owner: "{{ schleuder_schleuder_web_user }}"
+
 - name: Set bundle global config options
   ansible.builtin.command: "/usr/local/bin/bundle config set --global {{ item }}"
   changed_when: false
@@ -129,9 +136,8 @@
   when: __schleuder_repo_clone.changed # noqa: no-handler
   with_items:
     - "path {{ schleuder_schleuder_web_home }}/.gem"
-    - "without 'development test'"
 
-- name: Install bundle (when repo changed)
+- name: Install bundle
   ansible.builtin.command: "/usr/local/bin/bundle install"
   changed_when: false
   check_mode: no
@@ -141,7 +147,6 @@
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
     ansible_ssh_pipelining: True
-  when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Check if schleuder-web systemd unit already exists
   ansible.builtin.stat:
