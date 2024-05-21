@@ -129,7 +129,6 @@
   when: __schleuder_repo_clone.changed # noqa: no-handler
   with_items:
     - "path {{ schleuder_schleuder_web_home }}/.gem"
-    - "without 'development test'"
 
 - name: Install bundle (when repo changed)
   ansible.builtin.command: "/usr/local/bin/bundle install"
