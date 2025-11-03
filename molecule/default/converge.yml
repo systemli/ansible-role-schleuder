@@ -1,7 +1,7 @@
 ---
 - name: Converge
   hosts: all
-  become: true
+  become: yes
   roles:
     - role: ansible-role-schleuder
   vars:
