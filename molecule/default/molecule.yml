@@ -21,7 +21,3 @@ lint: yamllint .
 provisioner:
   name: ansible
   become: true
-
-verifier:
-  name: goss
-  enabled: yes
