@@ -16,4 +16,4 @@ galaxy_info:
     - name: Debian
       versions:
         - bookworm
-        - bullseye
+        - trixie
