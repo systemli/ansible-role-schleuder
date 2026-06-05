@@ -1,4 +1,21 @@
 ---
+- name: Ensure GCC 14 compatibility wrapper for native gem builds (Trixie+)
+  ansible.builtin.copy:
+    dest: "{{ schleuder_build_cc_wrapper }}"
+    owner: root
+    group: root
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      # Downgrade GCC 14's new default errors back to warnings so the old gems
+      # pinned by schleuder (nio4r, sqlite3, ...) still build their native
+      # extensions. Managed by the systemli.schleuder Ansible role.
+      # The flags must come last: Ruby's rbconfig CFLAGS already contain
+      # -Werror=implicit-function-declaration, and for conflicting -W(no-)error
+      # options GCC honours the one that appears last on the command line.
+      exec gcc "$@" -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=implicit-function-declaration
+  when: ansible_distribution_major_version | int >= 13
+
 - name: Install schleuder dependencies
   ansible.builtin.apt:
     name: "{{ __schleuder_dependencies }}"

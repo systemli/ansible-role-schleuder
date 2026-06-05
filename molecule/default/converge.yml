@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   roles:
-    - role: ansible-role-schleuder
+    - role: systemli.schleuder
   vars:
     __testing: True
     schleuder_install_gitlab_ticket_plugin: True

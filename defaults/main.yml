@@ -144,6 +144,29 @@ schleuder_web_superadmins:
 
 schleuder_web_version: "{{ 'debian/bullseye/3.6.0' if ansible_distribution_release == 'bullseye' else 'debian/bookworm/4.0.0' }}"
 
+# GCC 14 (Debian Trixie and later) turns -Wincompatible-pointer-types,
+# -Wint-conversion and -Wimplicit-function-declaration into errors by default.
+# The old gems pinned by schleuder (nio4r, sqlite3, the schleuder-gitlab-plugin
+# dependencies) then fail to build their native extensions. mkmf bakes CFLAGS
+# into each gem's Makefile as a hard assignment, so a CFLAGS environment
+# variable is ignored. Instead we override the make CC variable (via MAKEFLAGS,
+# which rubygems propagates to every gem build) with a small wrapper that
+# appends -Wno-error=... flags. This downgrades the diagnostics back to warnings
+# while preserving all original CFLAGS (-fPIC, hardening, ...). It only takes
+# effect on Trixie+, leaving Bookworm untouched.
+# TODO: Drop this workaround once schleuder ships Trixie releases that build
+# against current gems.
+schleuder_build_cc_wrapper: /usr/local/bin/schleuder-cc
+# Inline shell prefix for command/shell-based gem builds (empty on < Trixie).
+schleuder_build_env: >-
+  {{ "MAKEFLAGS=CC=" ~ schleuder_build_cc_wrapper ~ " "
+     if ansible_distribution_major_version | int >= 13 else "" }}
+# Dict form for the `environment:` keyword on module-based gem builds
+# (empty on < Trixie).
+schleuder_build_environment: >-
+  {{ {"MAKEFLAGS": "CC=" ~ schleuder_build_cc_wrapper}
+     if ansible_distribution_major_version | int >= 13 else {} }}
+
 schleuder_schleuder_web_api_host: "{{ schleuder_api.host }}"
 schleuder_schleuder_web_api_port: "{{ schleuder_api.port }}"
 

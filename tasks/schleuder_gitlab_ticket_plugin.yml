@@ -45,6 +45,7 @@
     gem_source: "{{ schleuder_gitlab_plugin_path }}/schleuder-gitlab-ticketing-1.0.0.gem"
     user_install: False
     state: present
+  environment: "{{ schleuder_build_environment }}"
 
 - name: Ensure schleuder filter path is present
   ansible.builtin.file:
@@ -54,9 +55,18 @@
     mode: "0755"
     state: directory
 
+# The gem lives under /var/lib/gems/<ruby-api-version>/, which differs per
+# Debian release (2.7.0 on bullseye, 3.1.0 on bookworm, 3.3.0 on trixie, ...).
+# Query it instead of hardcoding the mapping.
+- name: Determine Ruby gem install directory
+  ansible.builtin.command: gem env gemdir
+  register: __schleuder_gem_gemdir
+  changed_when: false
+  check_mode: no
+
 - name: Link gitlab-ticketing plugin as schleuder post_decryption filter
   ansible.builtin.file:
-    src: "/var/lib/gems/{% if ansible_distribution_release == 'bullseye' %}2.7.0{% else %}3.1.0{% endif %}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
+    src: "{{ __schleuder_gem_gemdir.stdout }}/gems/schleuder-gitlab-ticketing-1.0.0/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb"
     dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
     state: link
 

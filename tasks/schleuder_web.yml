@@ -137,8 +137,8 @@
   with_items:
     - "path {{ schleuder_schleuder_web_home }}/.gem"
 
-- name: Install bundle
-  ansible.builtin.command: "/usr/local/bin/bundle install"
+- name: Install bundle # noqa: command-instead-of-shell
+  ansible.builtin.shell: "{{ schleuder_build_env }}/usr/local/bin/bundle install"
   changed_when: false
   check_mode: no
   args:
