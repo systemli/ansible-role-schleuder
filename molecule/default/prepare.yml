@@ -6,3 +6,8 @@
     - name: Run the equivalent of "apt-get update" before installing packages
       ansible.builtin.apt:
         update_cache: true
+
+    - name: Install cron for testing in docker containers
+      ansible.builtin.apt:
+        pkg: cron
+        update_cache: true
