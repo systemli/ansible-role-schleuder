@@ -8,12 +8,6 @@ schleuder_schleuder_user: "schleuder"
 schleuder_gpg_use_tor: False
 schleuder_gpg_tor_keyserver: "hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion"
 
-### schleuder-gitlab-ticketing-plugin vars:
-schleuder_gitlab_plugin_path: "/opt/local/gitlab-ticketing"
-schleuder_gitlab_plugin_repo: https://0xacab.org/schleuder/schleuder-gitlab-ticketing
-schleuder_gitlab_plugin_git_update: False
-schleuder_gitlab_plugin_git_version: "main"
-
 ### schleuder-cli vars:
 schleuder_cli_path: "/root/.schleuder-cli"
 
