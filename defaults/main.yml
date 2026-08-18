@@ -1,6 +1,5 @@
 ---
 ### Define which playbooks should be run:
-schleuder_install_web: True
 schleuder_install_cli: True
 schleuder_install_gitlab_ticket_plugin: False
 
@@ -23,17 +22,6 @@ schleuder_lists: []
 #   admin_pubkey_present: True
 #   # if admin_pubkey_present is set to false
 #   schleuder list will be created, but is not functional
-
-### schleuder-web vars:
-schleuder_schleuder_web_repo: https://0xacab.org/schleuder/schleuder-web
-schleuder_schleuder_web_git_update: False
-schleuder_schleuder_web_home: "/var/www/schleuder-web"
-schleuder_schleuder_web_user: schleuder-web
-schleuder_schleuder_web_path: "{{ schleuder_schleuder_web_home }}/schleuder-web"
-schleuder_schleuder_web_systemd_path: "/etc/systemd/system/schleuder-web.service"
-schleuder_schleuder_web_environment_vars_path: "/etc/default/schleuder-web"
-# set to false will make rails server listen on localhost only
-schleuder_schleuder_web_allow_access_from_outside: True
 
 ### schleuder-gitlab-ticketing-plugin vars:
 schleuder_gitlab_plugin_path: "/opt/local/gitlab-ticketing"
@@ -126,26 +114,6 @@ schleuder_forward_all_incoming_to_admins: "false"
 schleuder_deliver_selfsent: "true"
 schleuder_set_reply_to_to_sender: "false"
 schleuder_munge_from: "false"
-
-### schleuder-web/database.yml
-# schleuder-web uses it's own database to store user credentials
-schleuder_web_database:
-  production:
-    adapter: "'sqlite3'"
-    database: "db/production.sqlite"
-    pool: 5
-    timeout: 5000
-
-### schleuder-web/schleuder-web.yml
-schleuder_web_web_hostname: example.org
-schleuder_web_mailer_from: noreply@example.org
-schleuder_web_superadmins:
-  - "{{ schleuder_superadmin }}"
-
-schleuder_web_version: "{{ 'debian/bullseye/3.6.0' if ansible_distribution_release == 'bullseye' else 'debian/bookworm/4.0.0' }}"
-
-schleuder_schleuder_web_api_host: "{{ schleuder_api.host }}"
-schleuder_schleuder_web_api_port: "{{ schleuder_api.port }}"
 
 ### schleuder/gitlab.yml
 # global settings

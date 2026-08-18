@@ -10,12 +10,8 @@ service and it's schleuder lists.
 
 ### What is installed during the ansible run ?
 
-This role will setup [schleuder](https://0xacab.org/schleuder/schleuder),
-[schleuder-cli](https://0xacab.org/schleuder/schleuder-cli), 
-[schleuder-web](https://0xacab.org/schleuder/schleuder-web) by default.
-
-The web interface is accessible via localhost:3000 and you can log in with 
-schleuders default credentials ("root@localhost" - "slingit!"). 
+This role will setup [schleuder](https://0xacab.org/schleuder/schleuder) and 
+[schleuder-cli](https://0xacab.org/schleuder/schleuder-cli), by default.
 
 Additionally you can install the schleuder-gitlab-ticketing-plugin and hook
 your schleuder lists to a gitlab instance. Therefore you have set 
@@ -26,8 +22,6 @@ your schleuder lists to a gitlab instance. Therefore you have set
 You need to have to setup and install a 
 [mail transport](https://schleuder.org/schleuder/docs/server-admins.html#hook-into-mail-transport-agent)
 on the server where schleuder is running. 
-Additionally you need to have a running web server with a vhost pointing to your schleuder-web
-interface and it's port. 
 
 Please consult the [schleuder documentation](https://schleuder.org/schleuder/docs/server-admins.html)
 for additional information.
@@ -37,14 +31,10 @@ for additional information.
 If a public key of the list admin is present, this role/schleuder will inform
 you about the list creation.
 
-Schleuder list admins can request their password by logging in through web
-interface, after their list was created.
-
 Role Variables
 --------------
 
     ### Define which playbooks should be run:
-    schleuder_install_web: True
     schleuder_install_cli: True
     schleuder_install_gitlab_ticket_plugin: False
     
@@ -67,17 +57,6 @@ Role Variables
       #  admin_pubkey_present: True
       #  # if admin_pubkey_present is set to false
       #  schleuder list will be created, but is not functional
-    
-    ### schleuder-web vars:
-    schleuder_schleuder_web_repo: https://0xacab.org/schleuder/schleuder-web
-    schleuder_schleuder_web_home: "/var/www/schleuder-web"
-    schleuder_schleuder_web_user: schleuder-web
-    schleuder_schleuder_web_path: "{{ schleuder_schleuder_web_home }}/schleuder-web"
-    schleuder_schleuder_web_git_update: False
-    schleuder_schleuder_web_systemd_path: "/etc/systemd/system/schleuder-web.service"
-    schleuder_schleuder_web_environment_vars_path: "/etc/default/schleuder-web"
-    # set to false will make rails server listen on localhost only
-    schleuder_schleuder_web_allow_access_from_outside: True
     
     ### schleuder-gitlab-ticketing-plugin vars:
     schleuder_gitlab_plugin_repo: https://0xacab.org/schleuder/schleuder-gitlab-ticketing
@@ -167,15 +146,6 @@ Role Variables
     schleuder_language: en
     schleuder_forward_all_incoming_to_admins: "false"
     
-    ### schleuder-web/database.yml
-    # schleuder-web uses it's own database to store user credentials
-    schleuder_web_database:
-      production:
-        adapter: "'sqlite3'"
-        database: "db/production.sqlite"
-        pool: 5
-        timeout: 5000
-    
     ### schleuder/gitlab.yml
     # global settings
     schleuder_gitlab_default_subject_filters: []
@@ -213,7 +183,6 @@ Example Playbook
 
 Extended Variables Example
 --------------------------
-
 
     schleuder_lists:
       - name: foobar@cryptolists.systemli.org
@@ -257,22 +226,9 @@ Tests
 
 For developing and testing the role we use Github Actions, Molecule, and Vagrant. On the local environment you can easily test the role with
 
-Run local tests with:
-
 ```
 molecule test 
 ```
-
-Requires Molecule, Vagrant and `python-vagrant` to be installed.For developing and testing the role we use Travis CI, Molecule and Vagrant. On the local environment you can easily test the role with
-
-
-This will spin up a virtual machine with Debian Bookworm. Afterwards you can connect to the Schleuder
-web interface via: 
-
-```
-http://localhost:3000
-```
-
 
 License
 -------

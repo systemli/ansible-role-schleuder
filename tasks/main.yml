@@ -19,12 +19,6 @@
     delay: 10
   when: schleuder_install.changed # noqa: no-handler
 
-- name: Import schleuder web tasks
-  ansible.builtin.import_tasks: schleuder_web.yml
-  tags:
-    - schleuder_web
-  when: schleuder_install_web
-
 - name: Import tasks for schleuder Gitlab plugin
   ansible.builtin.import_tasks: schleuder_gitlab_ticket_plugin.yml
   tags:
@@ -38,9 +32,3 @@
     loop_var: list
   tags:
     - schleuder_lists
-
-- name: Import goss tasks
-  ansible.builtin.import_tasks: goss.yml
-  tags:
-    - schleuder
-    - goss
