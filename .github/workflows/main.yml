@@ -15,4 +15,4 @@ jobs:
     name: Integration
     uses: systemli/github-ansible-workflow/.github/workflows/ansible-integration-workflow.yaml@998371abb4f2b95d4cf6b78b1f978bad639a66e5 # v1.6.2
     with:
-      distros: '[ "debian12", "debian11" ]'
+      distros: '[ "debian13" ]'
