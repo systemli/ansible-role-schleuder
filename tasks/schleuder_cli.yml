@@ -10,7 +10,7 @@
     state: directory
     owner: "root"
     group: "{{ schleuder_schleuder_user }}"
-    mode: "0600"
+    mode: "0700"
 
 - name: Ensure schleuder-cli.yml is latest
   ansible.builtin.template:
@@ -19,4 +19,8 @@
     owner: "root"
     group: "root"
     mode: "0600"
-  notify: Restart schleuder-api-daemon
+  when:
+    - schleuder_cli_api_host is defined
+    - schleuder_cli_api_port is defined
+    - schleuder_cli_api_key is defined and schleuder_cli_api_key | length > 0
+    - schleuder_cli_api_tls_fingerprint is defined and schleuder_cli_api_tls_fingerprint | length > 0

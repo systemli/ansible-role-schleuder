@@ -7,4 +7,3 @@
   vars:
     __testing: true
     schleuder_install_gitlab_ticket_plugin: true
-    schleuder_gpg_use_tor: true

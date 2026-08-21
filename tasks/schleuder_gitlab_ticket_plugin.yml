@@ -8,9 +8,18 @@
   ansible.builtin.file:
     path: /usr/local/lib/schleuder/filters/post_decryption
     owner: root
-    group: staff
+    group: root
     mode: "0755"
     state: directory
+
+# TODO - Review
+- name: Ensure plugin gets loaded via symlink
+  ansible.builtin.file:
+    dest: /usr/local/lib/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
+    group: root
+    owner: root
+    src: /usr/lib/ruby/vendor_ruby/schleuder/filters/post_decryption/99_gitlab_ticketing.rb
+    state: link
 
 - name: Ensure gitlab plugin config is latest
   ansible.builtin.template:
