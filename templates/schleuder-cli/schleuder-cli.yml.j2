@@ -1,4 +1,6 @@
-host: {{ schleuder_api.host }}
-port: {{ schleuder_api.port }}
-tls_fingerprint: {{ schleuder_tls_fingerprint }}
+# {{ ansible_managed }}
+
 api_key: {{ schleuder_cli_api_key }}
+host: {{ schleuder_cli_api_host }}
+port: {{ schleuder_cli_api_port }}
+tls_fingerprint: {{ schleuder_cli_api_tls_fingerprint }}
