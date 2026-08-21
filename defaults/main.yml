@@ -7,21 +7,6 @@ schleuder_install_gitlab_ticket_plugin: False
 schleuder_schleuder_user: "schleuder"
 schleuder_gpg_use_tor: False
 schleuder_gpg_tor_keyserver: "hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion"
-schleuder_admin_keys_path: "/var/lib/schleuder/adminkeys"
-
-schleuder_lists: []
-# - name: foobar@cryptolists.systemli.org
-#   admin: admin@systemli.org
-#   # be sure to copy public_key of list admin to
-#   # files/schleuder/adminkeys/{{ name }}_{{ admin }}.pub
-#   # else set admin_pubkey_present to false
-#   # ---
-#   send_list_key: True
-#   present: True
-#   # ---
-#   admin_pubkey_present: True
-#   # if admin_pubkey_present is set to false
-#   schleuder list will be created, but is not functional
 
 ### schleuder-gitlab-ticketing-plugin vars:
 schleuder_gitlab_plugin_path: "/opt/local/gitlab-ticketing"

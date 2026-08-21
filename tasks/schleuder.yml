@@ -98,14 +98,6 @@
     - schleuder_install.changed # noqa: no-handler
     - not __testing | default(False)
 
-- name: Ensure /var/lib/schleuder/adminkeys is present
-  ansible.builtin.file:
-    path: "{{ schleuder_admin_keys_path }}"
-    state: directory
-    owner: "root"
-    group: "{{ schleuder_schleuder_user }}"
-    mode: "0640"
-
 - name: Ensure /var/lib/schleuder/.gnupg is present
   ansible.builtin.file:
     path: "/var/lib/schleuder/.gnupg"

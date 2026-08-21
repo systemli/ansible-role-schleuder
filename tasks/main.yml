@@ -24,11 +24,3 @@
   tags:
     - schleuder_gitlab_ticket_plugin
   when: schleuder_install_gitlab_ticket_plugin
-
-- name: Include schleuder list tasks per list
-  ansible.builtin.include_tasks: schleuder_lists.yml
-  with_items: "{{ schleuder_lists }}"
-  loop_control:
-    loop_var: list
-  tags:
-    - schleuder_lists
