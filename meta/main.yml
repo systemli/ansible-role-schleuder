@@ -11,9 +11,7 @@ galaxy_info:
     - gpg
     - schleuder
     - schleudercli
-    - schleuderweb
   platforms:
     - name: Debian
       versions:
-        - bookworm
-        - bullseye
+        - trixie

@@ -20,3 +20,9 @@
     group: "root"
     mode: "0600"
   notify: Restart schleuder-api-daemon
+  when:
+    - schleuder_api is defined
+    - schleuder_api.host is defined
+    - schleuder_api.port is defined
+    - schleuder_cli_api_key is defined
+    - schleuder_tls_fingerprint is defined
