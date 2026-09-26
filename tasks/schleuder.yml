@@ -1,26 +1,12 @@
 ---
-- name: Install schleuder dependencies
+- name: Install schleuder and tor
   ansible.builtin.apt:
-    name: "{{ __schleuder_dependencies }}"
-    state: "present"
-  vars:
-    __schleuder_dependencies:
-      - sqlite3
-
-- name: Install tor
-  ansible.builtin.apt:
-    name: tor
-    state: "present"
-  when: schleuder_gpg_use_tor
-
-- name: Install schleuder
-  ansible.builtin.apt:
-    name: "{{ __schleuder_packages }}"
-    state: "present"
-  vars:
-    __schleuder_packages:
-      - schleuder
+    name: "{{ item }}"
+    state: present
   register: schleuder_install
+  with_items:
+    - schleuder
+    - tor
 
 - name: Ensure schleuder.yml is latest
   ansible.builtin.template:
@@ -39,16 +25,17 @@
     group: "{{ schleuder_schleuder_user }}"
     mode: "0640"
 
-- name: Check if schleuder api is reachable
+- name: Check if schleuder api is reachable on fresh install
   ansible.builtin.uri:
     url: "https://{{ schleuder_api.host }}:{{ schleuder_api.port }}/status.json"
-    validate_certs: False
+    validate_certs: false
     method: GET
     status_code: 200
     body_format: json
+  changed_when: true
   when:
     - schleuder_install.changed # noqa: no-handler
-    - not __testing | default(False)
+    - not __testing | default(false)
 
 - name: Ensure /var/lib/schleuder/.gnupg is present
   ansible.builtin.file:
@@ -57,7 +44,6 @@
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
     mode: "0700"
-  when: schleuder_gpg_use_tor
 
 - name: Ensure dirmngr.conf is latest
   ansible.builtin.template:
@@ -66,4 +52,3 @@
     owner: "{{ schleuder_schleuder_user }}"
     group: "{{ schleuder_schleuder_user }}"
     mode: "0600"
-  when: schleuder_gpg_use_tor

@@ -13,12 +13,6 @@
 - name: Flush handlers to ensure api is setup correct
   ansible.builtin.meta: flush_handlers
 
-- name: Wait until api is restarted on fresh install
-  ansible.builtin.wait_for:
-    port: 4443
-    delay: 10
-  when: schleuder_install.changed # noqa: no-handler
-
 - name: Import tasks for schleuder Gitlab plugin
   ansible.builtin.import_tasks: schleuder_gitlab_ticket_plugin.yml
   tags:

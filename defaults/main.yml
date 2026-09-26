@@ -1,11 +1,10 @@
 ---
 ### Define which playbooks should be run:
-schleuder_install_cli: True
-schleuder_install_gitlab_ticket_plugin: False
+schleuder_install_cli: true
+schleuder_install_gitlab_ticket_plugin: false
 
 ### schleuder vars:
 schleuder_schleuder_user: "schleuder"
-schleuder_gpg_use_tor: False
 schleuder_gpg_tor_keyserver: "hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion"
 
 ### schleuder-cli vars:
@@ -14,13 +13,27 @@ schleuder_cli_path: "/root/.schleuder-cli"
 ###### File Section
 
 ### schleuder/schleuder.yml.j2
+schleuder_api_defaults:
+  host: localhost
+  port: 4443
+  # Certificate and key to use. You can create new ones with `schleuder cert generate`.
+  tls_cert_file: "/etc/schleuder/schleuder-certificate.pem"
+  tls_key_file: "/etc/schleuder/schleuder-private-key.pem"
+schleuder_api_overrides: {}
+schleuder_api: "{{ schleuder_api_defaults | combine(schleuder_api_overrides, recursive=true) }}"
+schleuder_database:
+  production:
+    adapter: "sqlite3"
+    database: "/var/lib/schleuder/db.sqlite"
+    pragmas:
+      journal_mode: "delete"
+    timeout: 5000
 schleuder_lists_dir: "/var/lib/schleuder/lists"
-schleuder_listlogs_dir: "/var/lib/schleuder/lists"
-schleuder_plugins_dir: "/etc/schleuder/plugins"
+schleuder_listlogs_dir: "/var/log/schleuder/lists"
 schleuder_filters_dir: "/usr/local/lib/schleuder/filters"
 schleuder_log_level: "warn"
-schleuder_keyserver: "hkps://keys.openpgp.org"
-schleuder_superadmin: "root@localhost"
+schleuder_keyword_handlers_dir: "/usr/local/lib/schleuder/keyword_handlers"
+schleuder_sks_keyserver: ""
 schleuder_smtp_settings:
   address: localhost
   port: 25
@@ -30,18 +43,10 @@ schleuder_smtp_settings:
   # authentication:
   # user_name:
   # password:
-schleuder_database:
-  production:
-    adapter: "'sqlite3'"
-    database: "/var/lib/schleuder/db.sqlite"
-    pool: 5
-    timeout: 5000
-schleuder_api:
-  host: 127.0.0.1
-  port: 4443
-  # Certificate and key to use. You can create new ones with `schleuder cert generate`.
-  tls_cert_file: "/etc/schleuder/schleuder-certificate.pem"
-  tls_key_file: "/etc/schleuder/schleuder-private-key.pem"
+schleuder_superadmin: "root@localhost"
+schleuder_umask: 0077
+# keys.openpgp.org onion service, see https://keys.openpgp.org/about/faq/
+schleuder_vks_keyserver: "http://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion/"
 
 # List of api_keys to allow access to the API.
 # Example:
@@ -65,6 +70,7 @@ schleuder_headers_to_meta:
   - sig
   - enc
 schleuder_keep_msgid: "true"
+schleuder_key_auto_import_from_email: "false"
 schleuder_keywords_admin_only:
   - subscribe
   - unsubscribe
