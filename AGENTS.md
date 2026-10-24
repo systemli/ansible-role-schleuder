@@ -7,14 +7,14 @@ Ansible role that installs and configures Schleuder (mailing list manager, with 
 - `defaults/main.yml`: all role variables with defaults
 - `tasks/`: `main.yml` imports `schleuder.yml`, `schleuder_cli.yml`, `schleuder_web.yml`, `schleuder_lists.yml`, `schleuder_gitlab_ticket_plugin.yml` and `goss.yml`
 - `templates/`, `files/`, `handlers/`, `meta/main.yml`: role content and metadata
-- `molecule/default/`: Molecule scenario (Vagrant/VirtualBox) with goss tests in `tests/`
+- `molecule/default/`: Molecule scenario (Docker, Debian 13) with goss tests in `tests/`
 - `requirements.yml`: collections needed by the role (`community.general`)
 
 ## Checks
 
 - `ansible-lint .` must not report new findings (config in `.ansible-lint`, `molecule/` and `.github/` are excluded)
 - `yamllint .` uses `.yamllint`
-- `molecule test` needs Vagrant and VirtualBox; CI runs the integration workflow instead
+- `molecule test` runs the role in a Docker container; CI runs it on Debian 12 and 13 via the shared integration workflow
 - `ansible-lint` creates `.ansible/`; it is git ignored, never commit it
 
 ## Conventions
