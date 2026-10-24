@@ -5,7 +5,7 @@ galaxy_info:
   description: Role to setup and maintain schleuder software and it's lists
   company: systemli.org
   license: GPLv3
-  min_ansible_version: "2.2"
+  min_ansible_version: "2.18"
   galaxy_tags:
     - mail
     - gpg
@@ -16,4 +16,3 @@ galaxy_info:
     - name: Debian
       versions:
         - bookworm
-        - bullseye
