@@ -255,19 +255,18 @@ Testing & Development
 Tests
 -----
 
-For developing and testing the role we use Github Actions, Molecule, and Vagrant. On the local environment you can easily test the role with
+For developing and testing the role we use GitHub Actions and Molecule with the Docker driver.
+CI runs the role in a systemd-enabled container on Debian 11 and 12.
 
 Run local tests with:
 
 ```
-molecule test 
+molecule test
 ```
 
-Requires Molecule, Vagrant and `python-vagrant` to be installed.For developing and testing the role we use Travis CI, Molecule and Vagrant. On the local environment you can easily test the role with
-
-
-This will spin up a virtual machine with Debian Bookworm. Afterwards you can connect to the Schleuder
-web interface via: 
+Use `molecule converge` to only apply the role and `molecule login` to open a shell in the container.
+This requires Docker (or a compatible container runtime), `molecule` and `molecule-plugins[docker]`.
+The scenario publishes the Schleuder web interface on your machine:
 
 ```
 http://localhost:3000
