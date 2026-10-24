@@ -76,13 +76,13 @@
     repo: "{{ schleuder_schleuder_web_repo }}"
     dest: "{{ schleuder_schleuder_web_path }}"
     update: "{{ schleuder_schleuder_web_git_update }}"
-    force: True
-    verify_commit: True
+    force: true
+    verify_commit: true
     version: "{{ schleuder_web_version }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   register: __schleuder_repo_clone
 
 - name: Ensure schleuder-web web config is latest
@@ -111,9 +111,9 @@
 - name: Install bundler (when repo changed)
   ansible.builtin.command: "gem install bundler -v 2.4.18"
   changed_when: false
-  check_mode: no
+  check_mode: false
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Ensure correct permissions
@@ -126,13 +126,13 @@
 - name: Set bundle global config options
   ansible.builtin.command: "/usr/local/bin/bundle config set --global {{ item }}"
   changed_when: false
-  check_mode: no
+  check_mode: false
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   when: __schleuder_repo_clone.changed # noqa: no-handler
   with_items:
     - "path {{ schleuder_schleuder_web_home }}/.gem"
@@ -140,13 +140,13 @@
 - name: Install bundle
   ansible.builtin.command: "/usr/local/bin/bundle install"
   changed_when: false
-  check_mode: no
+  check_mode: false
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
 
 - name: Check if schleuder-web systemd unit already exists
   ansible.builtin.stat:
@@ -155,12 +155,12 @@
 
 - name: Generate schleuder-web's rake secret
   ansible.builtin.command: "/usr/local/bin/bundle exec rake secret"
-  changed_when: False
-  check_mode: no
+  changed_when: false
+  check_mode: false
   become: true
   become_user: "{{ schleuder_schleuder_web_user }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   register: __rake_secret
   args:
     chdir: "{{ schleuder_schleuder_web_path }}"
@@ -169,8 +169,8 @@
 - name: Register existing schleuder-web secret_key_base # noqa: no-free-form
   ansible.builtin.shell: "executable=/bin/bash set -o pipefail && grep SECRET_KEY_BASE {{ schleuder_schleuder_web_environment_vars_path }} | cut -d'=' -f2"
   register: schleuder_web_existing_secret_key_base_tmp
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   when: stat_schleuder_web_systemd_file.stat.exists # noqa: no-handler
 
 - name: Sanitize schleuder_web_existing_secret_key_base_tmp
@@ -203,7 +203,7 @@
   environment:
     SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   when: __schleuder_repo_clone.changed # noqa: no-handler
 
 - name: Setup schleuder-web database (when repo changed)
@@ -216,7 +216,7 @@
   environment:
     SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   when: __schleuder_repo_clone.changed and not __schleuder_schleuder_web_database.stat.exists
 
 - name: Migrate schleuder-web database (when repo changed)
@@ -229,7 +229,7 @@
   environment:
     SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
   when: __schleuder_repo_clone.changed and __schleuder_schleuder_web_database.stat.exists
 
 - name: Ensure schleuder-web database permissions
@@ -249,7 +249,7 @@
   environment:
     SECRET_KEY_BASE: "{{ schleuder_schleuder_web_secret_key_base }}"
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
 
 - name: Ensure schleuder-web environment file is latest
   ansible.builtin.template:
@@ -272,5 +272,5 @@
 - name: Start schleuder-web
   ansible.builtin.systemd:
     name: schleuder-web
-    enabled: yes
+    enabled: true
     state: started

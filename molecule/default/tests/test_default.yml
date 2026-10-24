@@ -28,4 +28,4 @@ http:
 
   https://localhost:4443/status.json:
     status: 200
-    allow-insecure: True
+    allow-insecure: true

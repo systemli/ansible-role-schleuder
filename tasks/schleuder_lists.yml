@@ -7,7 +7,7 @@
     chdir: /root
   check_mode: false
   register: existing_schleuder_lists
-  changed_when: False
+  changed_when: false
   tags:
     - schleuder_lists
 

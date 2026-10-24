@@ -27,10 +27,10 @@
   become_user: "{{ schleuder_schleuder_user }}"
   ansible.builtin.command: /usr/bin/schleuder cert fingerprint
   register: schleuder_tls_fingerprint_tmp
-  changed_when: False
-  check_mode: no
+  changed_when: false
+  check_mode: false
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
 
 - name: Sanitize schleuder_tls_fingerprint_tmp
   ansible.builtin.set_fact:
@@ -39,13 +39,13 @@
 - name: Generate new schleuder api key (when it does already exists)
   ansible.builtin.command: /usr/bin/schleuder new_api_key
   changed_when: false
-  check_mode: no
+  check_mode: false
   become: true
   become_user: "{{ schleuder_schleuder_user }}"
   register: schleuder_cli_install_api_key
   when: schleuder_install.changed # noqa: no-handler
   vars:
-    ansible_ssh_pipelining: True
+    ansible_ssh_pipelining: true
 
 - name: Set schleuder_api_key to registered key, if schleuder is installed
   ansible.builtin.set_fact:
@@ -61,8 +61,8 @@
 - name: Register existing schleuder api key # noqa: no-free-form
   ansible.builtin.shell: "executable=/bin/bash set -o pipefail && grep api_key {{ schleuder_cli_path }}/schleuder-cli.yml | cut -d' ' -f2"
   register: schleuder_cli_existing_api_key
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   when: stat_schleuder_cli_path.stat.exists and not schleuder_install.changed
 
 - name: Set schleuder_api_key, if schleuder is already installed
@@ -90,7 +90,7 @@
 - name: Check if schleuder api is reachable
   ansible.builtin.uri:
     url: "https://{{ schleuder_api.host }}:{{ schleuder_api.port }}/status.json"
-    validate_certs: False
+    validate_certs: false
     method: GET
     status_code: 200
     body_format: json
