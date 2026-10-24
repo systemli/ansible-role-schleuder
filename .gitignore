@@ -75,3 +75,6 @@ tramp
 molecule/*/.molecule
 tests/__pycache__
 vagrant/roles
+
+# Ansible
+.ansible/
