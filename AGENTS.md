@@ -1,20 +1,20 @@
 # AGENTS.md
 
-Ansible role that installs and configures Schleuder (mailing list manager, with optional schleuder-cli, web and GitLab ticket plugin) on Debian.
+Ansible role that installs and configures Schleuder (mailing list manager, with optional schleuder-cli and GitLab ticket plugin) on Debian from the Debian packages.
 
 ## Layout
 
 - `defaults/main.yml`: all role variables with defaults
-- `tasks/`: `main.yml` imports `schleuder.yml`, `schleuder_cli.yml`, `schleuder_web.yml`, `schleuder_lists.yml`, `schleuder_gitlab_ticket_plugin.yml` and `goss.yml`
+- `tasks/`: `main.yml` imports `schleuder.yml`, `schleuder_cli.yml` and `schleuder_gitlab_ticket_plugin.yml`
 - `templates/`, `files/`, `handlers/`, `meta/main.yml`: role content and metadata
-- `molecule/default/`: Molecule scenario (Docker, Debian 12) with goss tests in `tests/`
+- `molecule/default/`: Molecule scenario (Docker, Debian 13)
 - `requirements.yml`: collections needed by the role (`community.general`)
 
 ## Checks
 
 - `ansible-lint .` must not report new findings (config in `.ansible-lint`, `molecule/` and `.github/` are excluded)
 - `yamllint .` uses `.yamllint`
-- `molecule test` runs the role in a Docker container; CI runs it on Debian 11 and 12 via the shared integration workflow
+- `molecule test` runs the role in a Docker container; CI runs it on Debian 13 via the shared integration workflow
 - `ansible-lint` creates `.ansible/`; it is git ignored, never commit it
 
 ## Conventions

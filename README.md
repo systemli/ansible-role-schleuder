@@ -47,7 +47,7 @@ Tests
 -----
 
 For developing and testing the role we use GitHub Actions and Molecule with the Docker driver.
-CI runs the role in a systemd-enabled container on Debian 11 and 12.
+CI runs the role in a systemd-enabled container on Debian 13.
 
 ```
 molecule test

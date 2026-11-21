@@ -1,15 +1,11 @@
 ---
 argument_specs:
   main:
-    short_description: Install and configure Schleuder (with schleuder-cli, schleuder-web and GitLab ticketing plugin)
+    short_description: Install and configure Schleuder (with schleuder-cli and GitLab ticketing plugin)
     description:
-      - Installs Schleuder, optionally schleuder-cli, schleuder-web and the schleuder-gitlab-ticketing plugin, and manages mailing lists.
+      - Installs Schleuder 5 and optionally schleuder-cli and the schleuder-gitlab-ticketing plugin from the Debian packages.
       - Many list settings are written verbatim into YAML and are therefore strings such as C("true") or C("false").
     options:
-      schleuder_install_web:
-        type: bool
-        description:
-          - Install schleuder-web.
       schleuder_install_cli:
         type: bool
         description:
@@ -20,106 +16,64 @@ argument_specs:
           - Install the schleuder-gitlab-ticketing plugin.
       schleuder_schleuder_user:
         type: str
-      schleuder_gpg_use_tor:
-        type: bool
       schleuder_gpg_tor_keyserver:
         type: str
-      schleuder_admin_keys_path:
+      schleuder_cli_api_host:
         type: str
-      schleuder_lists:
-        type: list
-        elements: dict
+      schleuder_cli_api_key:
+        type: str
         description:
-          - Mailing lists to manage. The public key of the list admin has to be copied to C(files/schleuder/adminkeys/<name>_<admin>.pub), unless
-            C(admin_pubkey_present) is false (the list is created but not functional then).
-        options:
-          name:
-            type: str
-            required: true
-            description:
-              - List address.
-          admin:
-            type: str
-            required: true
-            description:
-              - Address of the list admin.
-          state:
-            type: str
-            choices:
-              - present
-              - absent
-            description:
-              - Defaults to C(present).
-          admin_pubkey_present:
-            type: bool
-            description:
-              - Defaults to true.
-          send_list_key:
-            type: bool
-          present:
-            type: bool
-            description:
-              - Not evaluated by the role (use C(state)).
-      schleuder_schleuder_web_repo:
-        type: str
-      schleuder_schleuder_web_git_update:
-        type: bool
-      schleuder_schleuder_web_home:
-        type: str
-      schleuder_schleuder_web_user:
-        type: str
-      schleuder_schleuder_web_path:
-        type: str
-      schleuder_schleuder_web_systemd_path:
-        type: str
-      schleuder_schleuder_web_environment_vars_path:
-        type: str
-      schleuder_schleuder_web_allow_access_from_outside:
-        type: bool
-        description:
-          - Not evaluated by the role, use C(schleuder_web_allow_access_from_outside) instead.
-      schleuder_gitlab_plugin_path:
-        type: str
-      schleuder_gitlab_plugin_repo:
-        type: str
-      schleuder_gitlab_plugin_git_update:
-        type: bool
-      schleuder_gitlab_plugin_git_version:
-        type: str
+          - API key used by schleuder-cli. C(schleuder-cli.yml) is only written if this and C(schleuder_cli_api_tls_fingerprint) are set.
+      schleuder_cli_api_port:
+        type: int
       schleuder_cli_path:
         type: str
+      schleuder_cli_api_tls_fingerprint:
+        type: str
+        description:
+          - TLS fingerprint of the Schleuder API, see C(schleuder cert fingerprint).
+      schleuder_api_host:
+        type: str
+      schleuder_api_port:
+        type: int
+      schleuder_api_tls_cert_file:
+        type: str
+      schleuder_api_tls_key_file:
+        type: str
+      schleuder_api_valid_api_keys:
+        type: list
+        elements: str
+        description:
+          - API keys which are allowed to access the API.
+      schleuder_database:
+        type: dict
+        description:
+          - Database configuration, written to C(schleuder.yml) as the C(production) environment.
       schleuder_lists_dir:
         type: str
       schleuder_listlogs_dir:
-        type: str
-      schleuder_plugins_dir:
         type: str
       schleuder_filters_dir:
         type: str
       schleuder_log_level:
         type: str
-      schleuder_keyserver:
+      schleuder_keyword_handlers_dir:
         type: str
-      schleuder_superadmin:
+      schleuder_sks_keyserver:
         type: str
       schleuder_smtp_settings:
         type: dict
         description:
           - SMTP settings with the keys C(address) and C(port) and optionally C(domain), C(enable_starttls_auto), C(openssl_verify_mode), C(authentication),
             C(user_name), C(password).
-      schleuder_database:
-        type: dict
+      schleuder_superadmin:
+        type: str
+      schleuder_umask:
+        type: raw
         description:
-          - Database configuration per environment, written to C(schleuder.yml).
-      schleuder_api:
-        type: dict
-        description:
-          - "API settings: C(host), C(port), C(tls_cert_file), C(tls_key_file)."
-      schleuder_valid_api_keys:
-        type: list
-        elements: str
-        description:
-          - API keys which are allowed to access the API.
+          - Umask as octal string such as C("0077").
+      schleuder_vks_keyserver:
+        type: str
       schleuder_send_encrypted_only:
         type: str
       schleuder_receive_encrypted_only:
@@ -136,6 +90,8 @@ argument_specs:
         type: list
         elements: str
       schleuder_keep_msgid:
+        type: str
+      schleuder_key_auto_import_from_email:
         type: str
       schleuder_keywords_admin_only:
         type: list
@@ -188,29 +144,6 @@ argument_specs:
         type: str
       schleuder_munge_from:
         type: str
-      schleuder_web_database:
-        type: dict
-        description:
-          - Database configuration per environment for schleuder-web.
-      schleuder_web_web_hostname:
-        type: str
-      schleuder_web_mailer_from:
-        type: str
-      schleuder_web_superadmins:
-        type: list
-        elements: str
-      schleuder_web_version:
-        type: str
-        description:
-          - Git tag of schleuder-web to check out. Defaults to a tag based on the Debian release.
-      schleuder_schleuder_web_api_host:
-        type: str
-        description:
-          - Defaults to the host of C(schleuder_api).
-      schleuder_schleuder_web_api_port:
-        type: int
-        description:
-          - Defaults to the port of C(schleuder_api).
       schleuder_gitlab_default_subject_filters:
         type: list
         elements: str
@@ -229,11 +162,3 @@ argument_specs:
         description:
           - "Settings per list: each item maps a list address to a dict with C(project), C(namespace), C(ticket_prefix), C(gitlab) (C(endpoint),
             C(token)), C(subject_filters) and C(sender_filters). See https://0xacab.org/schleuder/schleuder-gitlab-ticketing."
-      schleuder_web_allow_access_from_outside:
-        type: bool
-        description:
-          - If false, the rails server of schleuder-web only listens on localhost. Defaults to true.
-      schleuder_vagrant_testenvironment:
-        type: bool
-        description:
-          - Skip steps not working in a Vagrant test environment. Defaults to false.

@@ -7,10 +7,10 @@ schleuder_schleuder_user: schleuder
 schleuder_gpg_tor_keyserver: hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion
 
 schleuder_cli_api_host: localhost
-schleuder_cli_api_key: []
+schleuder_cli_api_key: ""
 schleuder_cli_api_port: 4443
 schleuder_cli_path: /root/.schleuder-cli
-schleuder_cli_api_tls_fingerprint: 
+schleuder_cli_api_tls_fingerprint: ""
 
 schleuder_api_host: localhost
 schleuder_api_port: 4443
@@ -30,12 +30,12 @@ schleuder_listlogs_dir: /var/lib/schleuder/lists
 schleuder_filters_dir: /usr/local/lib/schleuder/filters
 schleuder_log_level: warn
 schleuder_keyword_handlers_dir: /usr/local/lib/schleuder/keyword_handlers
-schleuder_sks_keyserver: 
+schleuder_sks_keyserver: ""
 schleuder_smtp_settings:
   address: localhost
   port: 25
 schleuder_superadmin: root@localhost
-schleuder_umask: 0077
+schleuder_umask: "0077"
 # keys.openpgp.org onion service, see https://keys.openpgp.org/about/faq/
 schleuder_vks_keyserver: http://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion/
 
@@ -60,11 +60,11 @@ schleuder_keywords_admin_only:
   - delete-key
 schleuder_keywords_admin_notify:
   - add-key
-schleuder_internal_footer: 
-schleuder_public_footer: 
-schleuder_subject_prefix: 
-schleuder_subject_prefix_in: 
-schleuder_subject_prefix_out: 
+schleuder_internal_footer: ""
+schleuder_public_footer: ""
+schleuder_subject_prefix: ""
+schleuder_subject_prefix_in: ""
+schleuder_subject_prefix_out: ""
 schleuder_bounces_drop_all: "false"
 schleuder_bounces_drop_on_headers:
   x-spam-flag: "yes"
