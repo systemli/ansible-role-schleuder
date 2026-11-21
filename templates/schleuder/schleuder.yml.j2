@@ -7,7 +7,7 @@ lists_dir: {{ schleuder_lists_dir }}
 listlogs_dir: {{ schleuder_listlogs_dir }}
 
 # Schleuder looks for additional, custom keyword-handlers in this directory.
-keyword_handlers_dir: {{ schleuder_keyword_handlers_dir }} 
+keyword_handlers_dir: {{ schleuder_keyword_handlers_dir }}
 
 # Schleuder reads filters also from this directory path,
 # in the specific pre_decryption or post_decryption subdirectory.
@@ -58,7 +58,7 @@ superadmin: {{ schleuder_superadmin }}
 # Only change this in special cases and if you know what you are doing!
 # (Be careful to retain the value type, it must not be quoted and it must start
 # with a zero!)
-umask: {{ '%04o' | format(schleuder_umask) }}
+umask: {{ schleuder_umask if schleuder_umask is string else '%04o' | format(schleuder_umask) }}
 
 # For these options see documentation for ActionMailer::smtp_settings, e.g. <http://api.rubyonrails.org/classes/ActionMailer/Base.html>.
 smtp_settings:
