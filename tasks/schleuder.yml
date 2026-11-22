@@ -45,10 +45,13 @@
     group: "{{ schleuder_schleuder_user }}"
     mode: "0700"
 
-- name: Ensure dirmngr.conf is latest
-  ansible.builtin.template:
-    src: schleuder/dirmngr.conf.j2
-    dest: "/var/lib/schleuder/.gnupg/dirmngr.conf"
-    owner: "{{ schleuder_schleuder_user }}"
-    group: "{{ schleuder_schleuder_user }}"
-    mode: "0600"
+- name: Stat obsolete dirmngr.conf
+  ansible.builtin.stat:
+    path: /var/lib/schleuder/.gnupg/dirmngr.conf
+  register: __stat_dirmngr_conf
+
+- name: Remove obsolete dirmngr.conf, if found
+  ansible.builtin.file:
+    path: "/var/lib/schleuder/.gnupg/dirmngr.conf"
+    state: absent
+  when: __stat_dirmngr_conf.stat.exists

@@ -4,7 +4,6 @@ schleuder_install_cli: true
 schleuder_install_gitlab_ticket_plugin: false
 
 schleuder_schleuder_user: schleuder
-schleuder_gpg_tor_keyserver: hkp://zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion
 
 schleuder_cli_api_host: localhost
 schleuder_cli_api_key: ""
@@ -28,6 +27,7 @@ schleuder_database:
 schleuder_lists_dir: /var/lib/schleuder/lists
 schleuder_listlogs_dir: /var/lib/schleuder/lists
 schleuder_filters_dir: /usr/local/lib/schleuder/filters
+schleuder_http_proxy: socks5h://127.0.0.1:9050
 schleuder_log_level: warn
 schleuder_keyword_handlers_dir: /usr/local/lib/schleuder/keyword_handlers
 schleuder_sks_keyserver: ""
